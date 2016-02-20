@@ -82,6 +82,7 @@ Platformer.World = function() {
 
     this.platforms = Platformer.game.add.group();
     this.obstacles = Platformer.game.add.group();
+    this.goals = Platformer.game.add.group();
 };
 
 Platformer.World.getPos = function(x, y) {
@@ -107,6 +108,9 @@ Platformer.World.prototype = {
             }
             else if(tile.type == "spawn") {
                 startPositions.push(tile.position);
+            }
+            else if(tile.type == "goal") {
+                that.addGoal(tile.position[0], tile.position[1], tile.color);
             }
         });
 
@@ -206,14 +210,29 @@ Platformer.World.prototype = {
         this.platforms.add(square);
     },
 
+    addGoal: function(x, y, color) {
+        var position = Platformer.World.getPos(x, y);
+        var square = Platformer.createSquare(position, color);
+
+        square.body.allowGravity = false;
+        square.body.immovable = true;
+
+        this.goals.add(square);
+    },
+
     update: function() {
-        this.player.collide(this.obstacles, this.onPlayerHitColission);
+        this.player.collide(this.obstacles, this.onPlayerHitObstacle);
+        this.player.collide(this.goals, this.onPlayerReachGoal);
         this.player.collide(this.platforms);
         this.player.update();
     },
 
-    onPlayerHitColission: function(obj, other) {
+    onPlayerHitObstacle: function(other) {
         console.log("DIE! at position", obj.x, obj.y);
+    },
+
+    onPlayerReachGoal: function(other) {
+        console.log("WIN! at position", obj.x, obj.y);
     },
 };
 
@@ -235,7 +254,6 @@ Platformer.Player = function(pos) {
 
 Platformer.Player.prototype = {
     update: function() {
-
         this.square.body.velocity.x = 0;
         if (this.cursors.left.isDown)
         {
@@ -255,7 +273,7 @@ Platformer.Player.prototype = {
 
     collide: function(other, callback) {
         if(Platformer.game.physics.arcade.collide(this.square, other) && callback) {
-            callback(this.square, other);
+            callback(other);
         }
     }
 };
