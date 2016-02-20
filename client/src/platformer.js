@@ -221,18 +221,26 @@ Platformer.World.prototype = {
     },
 
     update: function() {
-        this.player.collide(this.obstacles, this.onPlayerHitObstacle);
+        this.player.collide(this.obstacles, this.onPlayerDie);
         this.player.collide(this.goals, this.onPlayerReachGoal);
         this.player.collide(this.platforms);
         this.player.update();
+
+        // Check if we're not outside the level (dead)
+        var pos = this.player.getPos();
+        if(pos.x < Platformer.padding
+                || (this.bounds.max.x - pos.x) < Platformer.padding
+                || (this.bounds.max.y - pos.y) < Platformer.padding) {
+            this.onPlayerDie();
+        }
     },
 
-    onPlayerHitObstacle: function(other) {
-        console.log("DIE! at position", obj.x, obj.y);
+    onPlayerDie: function(other) {
+        console.log("DIE!");
     },
 
     onPlayerReachGoal: function(other) {
-        console.log("WIN! at position", obj.x, obj.y);
+        console.log("WIN!");
     },
 };
 
@@ -269,6 +277,13 @@ Platformer.Player.prototype = {
         {
             this.square.body.velocity.y = -Platformer.speed.jump;
         }
+    },
+
+    getPos: function() {
+        return {
+            x: this.square.x,
+            y: this.square.y,
+        };
     },
 
     collide: function(other, callback) {
