@@ -2,6 +2,8 @@
   "name": "demo-app",
   "version": "0.0.0",
   "dependencies": {
-    "phaser": "~2.4.6"
+    "phaser": "~2.4.6",
+    "sqlite3": "~3.1.1",
+    "express": "~4.13.4"
   }
 }
