@@ -45,6 +45,7 @@ Platformer.init = function() {
  */
 Platformer.createSquare = function(pos, color, scale) {
     scale = scale || 1.0;
+    color = Platformer.Color.fromHex(color);
     var graphics = Platformer.game.add.bitmapData(Platformer.unit * scale, Platformer.unit * scale);
     graphics.fill(color.r, color.g, color.b, color.a);
     var square = Platformer.game.add.sprite(pos.x, pos.y, graphics);
@@ -54,17 +55,34 @@ Platformer.createSquare = function(pos, color, scale) {
 }
 
 /**
+ * A helper function to create a circle with physics.
+ */
+Platformer.createCircle = function(pos, color, scale) {
+    var size = Platformer.unit * (scale || 1.0);
+    var bmd = Platformer.game.add.bitmapData(size, size);
+    bmd.ctx.fillStyle = color;
+    bmd.ctx.beginPath();
+    bmd.ctx.arc(bmd.width / 2, bmd.height / 2, size / 2, 0, 2 * Math.PI, true);
+    bmd.ctx.fill();
+
+    var circle = Platformer.game.add.sprite(pos.x, pos.y, bmd);
+    Platformer.game.physics.arcade.enable(circle);
+
+    return circle;
+}
+
+/**
  * The World object
  */
 Platformer.World = function() {
-    this.player = new Platformer.Player({x: 400, y: 800});
-    this.tiles = [];
+    this.player = new Platformer.Player(Platformer.World.getPos(8, 20));
     this.bounds = {
         min: {x: 0, y: 0},
         max: {x: 0, y: 0},
     };
 
     this.platforms = Platformer.game.add.group();
+    this.obstacles = Platformer.game.add.group();
 };
 
 Platformer.World.getPos = function(x, y) {
@@ -78,28 +96,15 @@ Platformer.World.prototype = {
     start: function(level) {
         var that = this;
         level.tiles.forEach(function(tile) {
-            var position = Platformer.World.getPos(tile.position[0], tile.position[1]);
-
-            var square = Platformer.createSquare(
-                position, Platformer.Color.fromHex(tile.color));
-
-            var max = {
-                x: position.x + Platformer.unit,
-                y: position.y + Platformer.unit,
-            };
-            if(max.x > that.bounds.max.x) {
-                that.bounds.max.x = max.x;
+            that.addPlatform(tile.position[0], tile.position[1], tile.color);
+            if(tile.type) {
+                if(tile.type == "spinner") {
+                    that.addSpinner(tile.position[0], tile.position[1]);
+                }
             }
-            if(max.y > that.bounds.max.y) {
-                that.bounds.max.y = max.y;
-            }
-
-            square.body.allowGravity = false;
-            square.body.immovable = true;
-
-            that.platforms.add(square);
-            that.tiles.push(square);
         });
+
+        this.addSpinner(11, 21);
 
         Platformer.game.world.setBounds(
             this.bounds.min.x, this.bounds.min.y,
@@ -107,7 +112,62 @@ Platformer.World.prototype = {
             this.bounds.max.y + Platformer.padding * 2);
     },
 
+    addSpinner: function(x, y) {
+        var pos = Platformer.World.getPos(x, y);
+
+        var radius = Platformer.unit * 2;
+        var speed = 0.075;
+        if(Math.floor(Math.random() * 10) < 5) {
+            speed *= -1;
+        }
+
+        var circularOffset = function(angle) {
+            return [{
+                x: pos.x + Math.sin(angle) * radius,
+                y: pos.y + Math.cos(angle) * radius,
+            }, angle + speed];
+        }
+
+        var angle = Math.floor(Math.random() * 1000) % 360;
+        var offset = circularOffset(angle);
+        angle = offset[1];
+
+        var circle = Platformer.createCircle(offset[0], "#FFFFFF", 0.85);
+        circle.body.allowGravity = false;
+
+        circle.update = function() {
+            var offset = circularOffset(angle);
+            angle = offset[1];
+            circle.x = offset[0].x;
+            circle.y = offset[0].y;
+        };
+
+        this.obstacles.add(circle);
+    },
+
+    addPlatform: function(x, y, color) {
+        var position = Platformer.World.getPos(x, y);
+        var square = Platformer.createSquare(position, color);
+
+        var max = {
+            x: position.x + Platformer.unit,
+            y: position.y + Platformer.unit,
+        };
+        if(max.x > this.bounds.max.x) {
+            this.bounds.max.x = max.x;
+        }
+        if(max.y > this.bounds.max.y) {
+            this.bounds.max.y = max.y;
+        }
+
+        square.body.allowGravity = false;
+        square.body.immovable = true;
+
+        this.platforms.add(square);
+    },
+
     update: function() {
+        this.player.collide(this.obstacles, true);
         this.player.collide(this.platforms);
         this.player.update();
     },
@@ -118,7 +178,7 @@ Platformer.World.prototype = {
  */
 Platformer.Player = function(pos) {
     this.square = Platformer.createSquare(
-        pos, Platformer.Color.fromHex("#FFFF00"), Platformer.playerScale);
+        pos, "#FFFF00", Platformer.playerScale);
 
     Platformer.game.camera.follow(this.square);
 
@@ -149,7 +209,9 @@ Platformer.Player.prototype = {
         }
     },
 
-    collide: function(other) {
-        Platformer.game.physics.arcade.collide(this.square, other);
+    collide: function(other, deadly) {
+        if(Platformer.game.physics.arcade.collide(this.square, other) && deadly) {
+            console.log("DIE!");
+        }
     }
 };
