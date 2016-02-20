@@ -1,0 +1,10 @@
+<script src="../../node_modules/soundcloud/sdk.js"></script>
+<script>
+  SC.initialize({
+    client_id: '153b01c39bb9ed8dc7abd46b634d0d3d'
+  });
+
+  SC.stream("/tracks/166188405").then( function(player){
+      player.play();
+  })
+</script>
