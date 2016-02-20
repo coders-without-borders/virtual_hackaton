@@ -2,6 +2,7 @@ var bodyParser = require("body-parser");
 var express = require('express');
 var database = require('./database.js');
 var votes = require("./votes.js");
+const worldgen = require('./worldgen/worldgen');
 
 var app = express();
 
@@ -15,6 +16,28 @@ app.use(function(req, res, next) {
 
 app.get('/', function (req, res) {
   res.send('The backend server');
+});
+
+app.get('/world/:user/:repo', function (req, res) {
+	const wg = new worldgen.WorldGenerator({
+	});
+
+	// hack
+	wg.github.authenticate({
+		type: "oauth",
+		token: "8a68c5caca83809d72e1053c267533d69aaba986",
+	});
+
+	wg.generateLevel({
+		user: req.params.user,
+		repo: req.params.repo,
+	}).then(function(levelData) {
+		res.send(levelData);
+	}).catch(function(e) {
+		console.log(e, e.stack.split('\n'));
+		res.status(500).send('error generating level');
+	});
+	
 });
 
 app.post('/votes/vote_for_repo', votes.vote_for_repo );
