@@ -72,14 +72,41 @@ function loneSpinner(levelData, platforms) {
 	platform.position = pointC;
 };
 
+function moverPlatform(levelData, platforms) {
+	var platform = platforms.splice(0,1)[0];
+
+	var angle = levelData.random.floating({min: -Math.PI*0.1, max: Math.PI*.2});
+	var dist = 6;
+	
+	var pointA = platform.prev ? platform.prev.position : [0, 0];
+	var pointB = [
+		Math.trunc(pointA[0] + Math.cos(angle)*dist),
+		Math.trunc(pointA[1] + Math.sin(angle)*dist)];
+
+	platform.position = pointB;
+	platform.width = 5;
+
+	for(var i = 0; i < platform.width; i += 1) {
+		var pos = [
+			Math.trunc(platform.position[0] - platform.width*0.5 + i),
+			platform.position[1]];
+		levelData.tiles.push({
+			type: 'mover',
+			position: pos,
+		});
+	}
+};
+
 const functions = [
 	easyStraightLine,
 	miniCluster,
 	loneSpinner,
+	moverPlatform,
 ];
 const weights = [
 	10,
 	3,
+	2,
 	1,
 ];
 
