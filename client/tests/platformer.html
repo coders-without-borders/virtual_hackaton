@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Platformer test</title>
+        <script src="../../node_modules/phaser/build/phaser.min.js"></script>
+        <script src="../src/platformer.js"></script>
+    </head>
+    <body>
+
+    <script type="text/javascript">
+
+    window.onload = function() {
+        Platformer.game = new Phaser.Game(400, 400, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+        var player;
+
+        function preload () {
+        }
+
+        function create () {
+            Platformer.init();
+            player = new Platformer.Player();
+        }
+
+        function update() {
+            player.update();
+        }
+    };
+
+    </script>
+
+    </body>
+</html>
