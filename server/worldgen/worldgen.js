@@ -293,10 +293,12 @@ WorldGenerator.prototype.generatePlatforms = function(levelData) {
 WorldGenerator.prototype.generateLevel = function(opts) {
 	const self = this;
 	return self.getLevelData(opts).then(function (levelData) {
+		levelData.tiles = [];
+		
 		self.generatePlatforms(levelData);
 
 		var result = {
-			tiles: [],
+			tiles: levelData.tiles,
 		};
 
 		levelData.platforms.forEach(function(commit) {

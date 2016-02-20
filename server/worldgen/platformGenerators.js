@@ -5,7 +5,6 @@ function easyStraightLine(levelData, platforms) {
 
 	if(count <= 0)
 		return;
-	console.log('easyStraightline', count);
 
 	var lastPos = platforms[0].prev ? platforms[0].prev.position : [0, 0];
 	
@@ -28,7 +27,6 @@ function miniCluster(levelData, platforms) {
 
 	if(count <= 0)
 		return;
-	console.log('miniCluster', count);
 
 	var lastPos = platforms[0].prev ? platforms[0].prev.position : [0, 0];
 	
@@ -52,13 +50,37 @@ function miniCluster(levelData, platforms) {
 	}
 };
 
+function loneSpinner(levelData, platforms) {
+	var platform = platforms.splice(0,1)[0];
+
+	var angle = levelData.random.floating({min: 0, max: Math.PI*2});
+	var dist = 15;
+	
+	var pointA = platform.prev ? platform.prev.position : [0, 0];
+	var pointC = [
+		Math.trunc(pointA[0] + Math.cos(angle)*dist),
+		Math.trunc(pointA[1] + Math.sin(angle)*dist)];
+	var pointB = [
+		Math.trunc((pointA[0] + pointC[0])*0.5),
+		Math.trunc((pointA[1] + pointC[1])*0.5)];
+
+	levelData.tiles.push({
+		type: 'spinner',
+		position: pointB,
+	});
+
+	platform.position = pointC;
+};
+
 const functions = [
 	easyStraightLine,
 	miniCluster,
+	loneSpinner,
 ];
 const weights = [
 	10,
 	3,
+	1,
 ];
 
 exports.generatePlatforms = function(levelData, platforms) {
