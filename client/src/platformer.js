@@ -6,12 +6,13 @@
  */
 var Platformer = Platformer || {
     unit: 35.0,
+    playerScale: 0.65,
     game: null,
-    gravity: 300,
+    gravity: 450,
     padding: 100,
     speed: {
-        walk: 185,
-        jump: 200,
+        walk: 120,
+        jump: 180,
     },
 };
 
@@ -42,8 +43,9 @@ Platformer.init = function() {
 /**
  * A helper function to create a square with physics.
  */
-Platformer.createSquare = function(pos, color) {
-    var graphics = Platformer.game.add.bitmapData(Platformer.unit, Platformer.unit);
+Platformer.createSquare = function(pos, color, scale) {
+    scale = scale || 1.0;
+    var graphics = Platformer.game.add.bitmapData(Platformer.unit * scale, Platformer.unit * scale);
     graphics.fill(color.r, color.g, color.b, color.a);
     var square = Platformer.game.add.sprite(pos.x, pos.y, graphics);
     Platformer.game.physics.arcade.enable(square);
@@ -61,6 +63,8 @@ Platformer.World = function() {
         min: {x: 0, y: 0},
         max: {x: 0, y: 0},
     };
+
+    this.platforms = Platformer.game.add.group();
 };
 
 Platformer.World.getPos = function(x, y) {
@@ -93,6 +97,7 @@ Platformer.World.prototype = {
             square.body.allowGravity = false;
             square.body.immovable = true;
 
+            that.platforms.add(square);
             that.tiles.push(square);
         });
 
@@ -103,11 +108,7 @@ Platformer.World.prototype = {
     },
 
     update: function() {
-        var that = this;
-        this.tiles.forEach(function(tile) {
-            that.player.collide(tile);
-        });
-
+        this.player.collide(this.platforms);
         this.player.update();
     },
 };
@@ -117,7 +118,7 @@ Platformer.World.prototype = {
  */
 Platformer.Player = function(pos) {
     this.square = Platformer.createSquare(
-        pos, Platformer.Color.fromHex("#FFFF00"));
+        pos, Platformer.Color.fromHex("#FFFF00"), Platformer.playerScale);
 
     Platformer.game.camera.follow(this.square);
 
@@ -141,7 +142,7 @@ Platformer.Player.prototype = {
             this.square.body.velocity.x = Platformer.speed.walk;
         }
 
-        var allowToJump = true;
+        var allowToJump = this.square.body.touching.down;
         if (this.jumpButton.isDown && allowToJump)
         {
             this.square.body.velocity.y = -Platformer.speed.jump;
