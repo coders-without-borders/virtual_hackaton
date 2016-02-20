@@ -101,10 +101,14 @@ Platformer.World.prototype = {
                 if(tile.type == "spinner") {
                     that.addSpinner(tile.position[0], tile.position[1]);
                 }
+                else if(tile.type == "mover") {
+                    that.addMover(tile.position[0], tile.position[1]);
+                }
             }
         });
 
         this.addSpinner(11, 21);
+        this.addMover(5, 25);
 
         Platformer.game.world.setBounds(
             this.bounds.min.x, this.bounds.min.y,
@@ -126,7 +130,7 @@ Platformer.World.prototype = {
                 x: pos.x + Math.sin(angle) * radius,
                 y: pos.y + Math.cos(angle) * radius,
             }, angle + speed];
-        }
+        };
 
         var angle = Math.floor(Math.random() * 1000) % 360;
         var offset = circularOffset(angle);
@@ -137,6 +141,39 @@ Platformer.World.prototype = {
 
         circle.update = function() {
             var offset = circularOffset(angle);
+            angle = offset[1];
+            circle.x = offset[0].x;
+            circle.y = offset[0].y;
+        };
+
+        this.obstacles.add(circle);
+    },
+
+    addMover: function(x, y) {
+        var pos = Platformer.World.getPos(x, y);
+
+        var radius = Platformer.unit * 2;
+        var speed = 0.075;
+        if(Math.floor(Math.random() * 10) < 5) {
+            speed *= -1;
+        }
+
+        var linearOffset = function(angle) {
+            return [{
+                x: pos.x,
+                y: pos.y + Math.sin(angle) * radius
+            }, angle + speed];
+        };
+
+        var angle = Math.floor(Math.random() * 1000) % 360;
+        var offset = linearOffset(angle);
+        angle = offset[1];
+
+        var circle = Platformer.createCircle(offset[0], "#FFFFFF", 0.85);
+        circle.body.allowGravity = false;
+
+        circle.update = function() {
+            var offset = linearOffset(angle);
             angle = offset[1];
             circle.x = offset[0].x;
             circle.y = offset[0].y;
