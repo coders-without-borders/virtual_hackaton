@@ -22,12 +22,6 @@ app.get('/world/:user/:repo', function (req, res) {
 	const wg = new worldgen.WorldGenerator({
 	});
 
-	// hack
-	wg.github.authenticate({
-		type: "oauth",
-		token: "8a68c5caca83809d72e1053c267533d69aaba986",
-	});
-
 	wg.generateLevel({
 		user: req.params.user,
 		repo: req.params.repo,
