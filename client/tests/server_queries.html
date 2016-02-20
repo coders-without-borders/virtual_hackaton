@@ -7,7 +7,7 @@
     </head>
     <body>
 
-        <form action="http://http://unks308b7a51.nuclearcookie.koding.io/:3000/votes/vote_for_repo" method="post">
+        <form action="http://unks308b7a51.nuclearcookie.koding.io:3000/votes/vote_for_repo" method="post">
             <input type="text" name="repo_url" placeholder="valid github url">
             <input type="submit" value="Vote!">
         </form>
@@ -17,13 +17,14 @@
         <script type="text/javascript">
          $(function(){
              updateDbEntries();
+             testOnionSkins();
          });
 
          function updateDbEntries()
          {
              var top5 = $("#top5");
              top5.empty();
-             $.getJSON( "http://http://unks308b7a51.nuclearcookie.koding.io/:3000/votes/get_top_repos", function( data ) {
+             $.getJSON( "http://unks308b7a51.nuclearcookie.koding.io:3000/votes/get_top_repos", function( data ) {
                  if ( data.rows ) {
                      for( var i = 0; i < data.rows.length; ++i ) {
                          var row = data.rows[i];
@@ -41,8 +42,38 @@
 
          function vote(element)
          {
-             $.post("http://http://unks308b7a51.nuclearcookie.koding.io/:3000/votes/vote_for_repo", { repo_url : $(element).html()});
+             $.post("http://unks308b7a51.nuclearcookie.koding.io:3000/votes/vote_for_repo", { repo_url : $(element).html()});
              updateDbEntries();
+         }
+
+         function testOnionSkins()
+         {
+             $.post("http://localhost:3000/onion_skin/drop");
+             
+             $.ajax({
+                 url: "http://localhost:3000/onion_skin/add",
+                 method: "POST",
+                 data: { color : "#aabbcc", positions : [{ x: 50, y: 50 }, { x: 80, y: 50 }, {x: 80, y: 20} ] },
+                 async: false
+             });
+             $.ajax({
+                 url: "http://localhost:3000/onion_skin/add",
+                 method: "POST",
+                 dataType: "text",
+                 data: { color : "#aabbcc", positions : [{ x: 400, y: 50 }, { x: 8, y: 5 }, {x: 8, y: 2} ] },
+                 async: false
+             });
+              $.ajax({
+                  url: "http://localhost:3000/onion_skin/add",
+                  method: "POST",
+                  dataType: "text",
+                  data: { color : "#aabbcc", positions : [{ x: 150, y: 150 }, { x: 80, y: 1000 }, {x: 180, y: 120} ] },
+                  async: false
+              });
+
+             $.post("http://localhost:3000/onion_skin/get_visible", { left: -200, right: 200, top: 200, bottom: -200}, function( data ) {
+                 console.log(data);
+             });
          }
         </script>
 

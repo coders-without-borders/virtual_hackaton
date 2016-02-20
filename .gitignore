@@ -1,2 +1,7 @@
 node_modules
 db.sqlite
+journal
+*.0
+*.ns
+*.1
+mongod.lock

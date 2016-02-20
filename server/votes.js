@@ -1,5 +1,5 @@
 (function() {
-    var database = require("./database.js");
+    var database = require("./sqlite_database.js");
 
     function vote_for_repo( req, res )
     {
