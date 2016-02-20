@@ -3,86 +3,48 @@
     <head>
         <meta charset="UTF-8" />
         <title>Server test</title>
+        <script src="https://code.jquery.com/jquery-2.2.0.min.js"/></script>
+    </head>
+    <body>
+
         <form action="http://localhost:3000/votes/vote_for_repo" method="post">
             <input type="text" name="repo_url" placeholder="valid github url">
             <input type="submit" value="Vote!">
         </form>
-    </head>
-    <body>
+        <h1>Top 5 db entries</h1>
+        <div id="top5">
+        </div>
+        <script type="text/javascript">
+         $(function(){
+             updateDbEntries();
+         });
 
-    <script type="text/javascript">
+         function updateDbEntries()
+         {
+             var top5 = $("#top5");
+             top5.empty();
+             $.getJSON( "http://localhost:3000/votes/get_top_repos", function( data ) {
+                 if ( data.rows ) {
+                     for( var i = 0; i < data.rows.length; ++i ) {
+                         var row = data.rows[i];
+                         $("<a href='#'>" + row.idRepo + "</a>")
+                            .click(
+                                function(element) {
+                                    vote(element.target)
+                                }
+                            ).appendTo(top5);
+                        top5.append("|" + row.votes + "<br/>");
+                     }
+                 }
+             });
+         }
 
-    window.onload = function() {
-
-        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
-        var cursors;
-        var player;
-
-        function preload () {
-
-           game.load.image('character', 'assets/mario_logo.png');
-
-        }
-
-        function create () {
-
-            game.physics.startSystem(Phaser.Physics.ARCADE);
-
-            player = game.add.sprite(game.world.centerX, game.world.centerY, 'character');
-            player.anchor.setTo(0.5, 0.5);
-            game.physics.arcade.enable(player);
-
-            player.body.bounce.y = 0.2;
-            player.body.gravity.y = 300;
-            player.body.collideWorldBounds = true;
-
-
-
-        }
-
-        function update() {
-
-            cursors = game.input.keyboard.createCursorKeys();
-            //  Collide the player and the stars with the platforms
-           // game.physics.arcade.collide(player, platforms);
-
-           //  Reset the players velocity (movement)
-
-            player.body.velocity.x = 0;
-
-            if (cursors.left.isDown)
-            {
-                //  Move to the left
-                player.body.velocity.x = -150;
-
-                player.animations.play('left');
-            }
-            else if (cursors.right.isDown)
-            {
-                //  Move to the right
-                player.body.velocity.x = 150;
-
-                player.animations.play('right');
-            }
-            else
-            {
-                //  Stand still
-                player.animations.stop();
-
-                player.frame = 4;
-            }
-
-            //  Allow the player to jump if they are touching the ground.
-            if (cursors.up.isDown && player.body.touching.down)
-            {
-                player.body.velocity.y = -350;
-            }
-
-        }
-
-    };
-
-    </script>
+         function vote(element)
+         {
+             $.post("http://localhost:3000/votes/vote_for_repo", { repo_url : $(element).html()});
+             updateDbEntries();
+         }
+        </script>
 
     </body>
 </html>
