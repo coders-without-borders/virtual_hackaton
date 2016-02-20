@@ -1,11 +1,14 @@
 var express = require('express');
 var database = require('./database.js');
+var votes = require("./votes.js");
 
 var app = express();
 
 app.get('/', function (req, res) {
   res.send('The backend server');
 });
+
+app.post('/votes/vote_for_repo', votes.vote_for_repo );
 
 database.initialize();
 
