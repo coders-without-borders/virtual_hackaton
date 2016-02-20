@@ -1,8 +1,11 @@
+var bodyParser = require("body-parser");
 var express = require('express');
 var database = require('./database.js');
 var votes = require("./votes.js");
 
 var app = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', function (req, res) {
   res.send('The backend server');

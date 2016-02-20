@@ -3,17 +3,19 @@
 
     function vote_for_repo( req, res )
     {
-        var data = JSON.parse(req.body.json);
+        console.log(req.body);
+        var data = req.body;
 
         database.run(
-            'INSERT INTO votes(idRepo) VALUES( ? ); UPDATE votes SET votes.votes=votes.votes + 1',
+            'INSERT OR REPLACE INTO votes(idRepo, votes) VALUES( ?, COALESCE((SELECT votes FROM votes WHERE idRepo = ?), 0) + 1);',
+            data.repo_url,
             data.repo_url,
             function( err, row ) {
                 if ( err ) {
                     console.log(err);
+                } else {
+                    console.log("Voted for repository" );
                 }
-
-                console.log("Voted for repository " + row.idRepo + " , " + row.votes );
             }
         );
     }

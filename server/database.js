@@ -41,5 +41,23 @@
         console.log('Database opened successfully.');
     }
 
+    function run()
+    {
+        db.run.apply(db, arguments);
+    }
+
+    function all()
+    {
+        db.all.apply(db, arguments);
+    }
+
+    function get()
+    {
+        db.get.apply(db, arguments);
+    }
+
     module.exports.initialize = initialize;
+    module.exports.run = run;
+    module.exports.all = all;
+    module.exports.get = get;
 }());
