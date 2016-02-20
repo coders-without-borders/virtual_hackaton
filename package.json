@@ -1,0 +1,7 @@
+{
+  "name": "demo-app",
+  "version": "0.0.0",
+  "dependencies": {
+    "phaser": "~2.4.6"
+  }
+}
