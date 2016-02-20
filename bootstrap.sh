@@ -1,7 +1,7 @@
 #!/bin/bash
-STR=$(npm ls grunt | grep -c grunt)
+STR=$(npm list -g --depth=0 | grep -c grunt-cli)
 if [ "$STR" = "0" ]; then
-    npm install -g grunt
+    npm install -g grunt-cli
 fi
 
 mkdir node_modules
