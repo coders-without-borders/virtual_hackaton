@@ -4,28 +4,36 @@
         <meta charset="UTF-8" />
         <title>Platformer test</title>
         <script src="../../node_modules/phaser/build/phaser.min.js"></script>
+        <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
         <script src="../src/platformer.js"></script>
     </head>
     <body>
 
     <script type="text/javascript">
 
-    window.onload = function() {
-        Platformer.game = new Phaser.Game(400, 400, Phaser.AUTO, '', { preload: preload, create: create, update: update });
-        var player;
+    $(function() {
+        const levelURL = "https://gist.githubusercontent.com/ricky26/f6153d3520ff50fe38ba/raw/65ce1014052fa33e0c5d79ea8a87b8d7632c6282/level.json";
+        $.getJSON(levelURL).then(function (level) {
+            Platformer.game = new Phaser.Game(
+                400, 400, Phaser.AUTO, '',
+                { preload: preload, create: create, update: update });
 
-        function preload () {
-        }
+            var world;
 
-        function create () {
-            Platformer.init();
-            player = new Platformer.Player();
-        }
+            function preload () {
+            }
 
-        function update() {
-            player.update();
-        }
-    };
+            function create () {
+                Platformer.init();
+                world = new Platformer.World();
+                world.start(level);
+            }
+
+            function update() {
+                world.update();
+            }
+        });
+    });
 
     </script>
 
