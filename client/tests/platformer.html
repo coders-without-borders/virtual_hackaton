@@ -12,7 +12,7 @@
     <script type="text/javascript">
 
     $(function() {
-        const levelURL = "https://gist.githubusercontent.com/ricky26/f6153d3520ff50fe38ba/raw/65ce1014052fa33e0c5d79ea8a87b8d7632c6282/level.json";
+        const levelURL = "http://localhost:3000/world/rust-lang/rust";
         $.getJSON(levelURL).then(function (level) {
             Platformer.game = new Phaser.Game(
                 400, 400, Phaser.AUTO, '',

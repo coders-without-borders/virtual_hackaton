@@ -75,7 +75,6 @@ Platformer.createCircle = function(pos, color, scale) {
  * The World object
  */
 Platformer.World = function() {
-    this.player = new Platformer.Player(Platformer.World.getPos(8, 20));
     this.bounds = {
         min: {x: 0, y: 0},
         max: {x: 0, y: 0},
@@ -95,20 +94,24 @@ Platformer.World.getPos = function(x, y) {
 Platformer.World.prototype = {
     start: function(level) {
         var that = this;
+        var startPositions = [];
         level.tiles.forEach(function(tile) {
-            that.addPlatform(tile.position[0], tile.position[1], tile.color);
-            if(tile.type) {
-                if(tile.type == "spinner") {
-                    that.addSpinner(tile.position[0], tile.position[1]);
-                }
-                else if(tile.type == "mover") {
-                    that.addMover(tile.position[0], tile.position[1]);
-                }
+            if(tile.type == null) {
+                that.addPlatform(tile.position[0], tile.position[1], tile.color);
+            }
+            else if(tile.type == "spinner") {
+                that.addSpinner(tile.position[0], tile.position[1]);
+            }
+            else if(tile.type == "mover") {
+                that.addMover(tile.position[0], tile.position[1]);
+            }
+            else if(tile.type == "spawn") {
+                startPositions.push(tile.position);
             }
         });
 
-        this.addSpinner(11, 21);
-        this.addMover(5, 25);
+        var pos = startPositions[Math.floor(Math.random() * startPositions.length)];
+        this.player = new Platformer.Player(Platformer.World.getPos(pos[0], pos[1]));
 
         Platformer.game.world.setBounds(
             this.bounds.min.x, this.bounds.min.y,
@@ -204,9 +207,13 @@ Platformer.World.prototype = {
     },
 
     update: function() {
-        this.player.collide(this.obstacles, true);
+        this.player.collide(this.obstacles, this.onPlayerHitColission);
         this.player.collide(this.platforms);
         this.player.update();
+    },
+
+    onPlayerHitColission: function(obj, other) {
+        console.log("DIE! at position", obj.x, obj.y);
     },
 };
 
@@ -246,9 +253,9 @@ Platformer.Player.prototype = {
         }
     },
 
-    collide: function(other, deadly) {
-        if(Platformer.game.physics.arcade.collide(this.square, other) && deadly) {
-            console.log("DIE!");
+    collide: function(other, callback) {
+        if(Platformer.game.physics.arcade.collide(this.square, other) && callback) {
+            callback(this.square, other);
         }
     }
 };
