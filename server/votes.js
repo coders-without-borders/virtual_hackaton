@@ -53,10 +53,10 @@
 	}
 
 	function get_top_repo(cb) {
-        database.all(
-            'SELECT * FROM votes ORDER BY votes DESC LIMIT 1',
-            function( err, rows ) {
-				cb(err, rows[0]);
+        database.get(
+            'SELECT * FROM votes ORDER BY votes DESC',
+            function( err, row ) {
+				cb(err, row);
             }
         );
 	}
