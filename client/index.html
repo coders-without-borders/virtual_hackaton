@@ -18,13 +18,13 @@
   <body>
 	<div id="ui">
 	  <!-- Loading -->
-	  <div id="ui_loading" class="ui uiScreen loadingScreen">
+	  <div id="ui_loading" class="ui uiScreen uiHidden loadingScreen">
 		<p>Loading...</p>
 		<div class="spinner"></div>
 	  </div>
 
 	  <!-- Left Sidebar -->
-	  <div id="ui_left" class="ui uiScreen uiSidebar uiVisible">
+	  <div id="ui_left" class="ui uiScreen uiSidebar">
         <div id="audioArea" class="panelArea sidebarWidth uiHidden">
             <iframe width="100%" height="450" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/49514219&amp;auto_play=true&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true"></iframe>
         </div>
@@ -49,11 +49,11 @@
 	  </div>
 
 	  <!-- right Sidebar -->
-	  <div id="ui_right" class="ui uiScreen uiSidebar uiVisible">
+	  <div id="ui_right" class="ui uiScreen uiSidebar">
 	  </div>
 
 	  <!-- On-death screen -->
-	  <div id="ui_dead" class="ui uiScreen">
+	  <div id="ui_dead" class="ui uiScreen uiHidden">
 		<h1>You died!</h1>
 		<form id="deadForm" action="#">
 		  <div id="messageFieldSet" class="fieldset radioButtons">
@@ -80,7 +80,7 @@
 	  </div>
 
 	  <!-- On-win screen -->
-	  <div id="ui_won" class="ui uiScreen">
+	  <div id="ui_won" class="ui uiScreen uiHidden">
 		<h1>You won!</h1>
 		<form id="wonForm" action="#">
 		  <label class="labelAbove">Press space to continue!</label>

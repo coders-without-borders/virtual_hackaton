@@ -296,6 +296,7 @@ LevelState.prototype = {
 		if(Platformer.ui) {
 			this.leftSidebar = Platformer.ui.factory("left");
 			this.rightSidebar = Platformer.ui.factory("right");
+			this.leftSidebar.element("audioArea").removeClass('uiHidden');
 
 			this.refresh();
 		}
@@ -320,9 +321,7 @@ LevelState.prototype = {
 					var ele = $('<li class="levelBtn"/>').append(span).appendTo(target);
 				});
 
-				self.leftSidebar.element('voteArea').css({
-					visibility: 'visible',
-				});
+				self.leftSidebar.element('voteArea').removeClass('uiHidden');
 
 				self.refreshTimeout = setTimeout(function() {
 					self.refreshTimeout = null;
@@ -339,8 +338,9 @@ LevelState.prototype = {
 	shutdown: function() {
 		if(Platformer.ui) {
 			var sidebar = Platformer.ui.factory("left");
-			sidebar.element("commitArea").css({ visibility: 'hidden' });
-			sidebar.element("voteArea").css({ visibility: 'hidden' });
+			sidebar.element("commitArea").addClass('uiHidden');
+			sidebar.element("voteArea").addClass('uiHidden');
+			sidebar.element("audioArea").addClass('uiHidden');
 		}
 	},
 };
@@ -359,7 +359,7 @@ DeadState.prototype = {
 			this.ui = Platformer.ui.factory('dead');
 
 			this.ui.element("spinner").show();
-			this.ui.element("voteFields").hide();
+			this.ui.element("voteFields").addClass('uiHidden');
 			this.ui.show();
 
 			$.getJSON("/votes/get_top_repos")
@@ -377,7 +377,7 @@ DeadState.prototype = {
 					});
 
 					self.ui.element("spinner").hide();
-					self.ui.element("voteFields").show();
+					self.ui.element("voteFields").removeClass('uiHidden');
 				});
 
 			this.ui.element("deadForm").submit(function() {
@@ -716,9 +716,7 @@ Platformer.World.prototype = {
 			commit.find('#author').text(data.author);
 			commit.find('#commitSha').text(data.id);
 			commit.find('#commitMsg').text(data.message);
-			commit.css({
-				visibility: 'visible',
-			}).show();
+			commit.removeClass('uiHidden');
 		}
 	},
 };

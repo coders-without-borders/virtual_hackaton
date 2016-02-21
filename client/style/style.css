@@ -22,15 +22,11 @@ body, canvas {
 }
 
 #ui .ui {
-	visibility: hidden;
-}
-
-#ui .ui.uiVisible {
-	visibility: visible;
 }
 
 #ui .uiHidden {
 	visibility: hidden;
+	display: none;
 }
 
 #ui .ui.uiSidebar {
