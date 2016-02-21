@@ -59,6 +59,41 @@ Platformer.Color.fromHex = function(hex) {
 };
 
 /**
+ * A simple bounds class (min/max)
+ */
+Platformer.Bounds = function(min, max) {
+    this.min = min ||
+        { x: Number.MAX_VALUE, y: Number.MAX_VALUE };
+    this.max = max ||
+        { x: -Number.MAX_VALUE, y: -Number.MAX_VALUE };
+};
+
+Platformer.Bounds.prototype = {
+    addPos: function(pos) {
+        if(pos.x < this.min.x) {
+            this.min.x = pos.x;
+        }
+        else if(pos.x > this.max.x) {
+            this.max.x = pos.x;
+        }
+
+        if(pos.y < this.min.y) {
+            this.min.y = pos.y;
+        }
+        else if(pos.y > this.max.y) {
+            this.max.y = pos.y;
+        }
+    },
+
+    computeCenter: function() {
+        return {
+            x: ((this.max.x - this.min.x) / 2.0) + this.min.x,
+            y: ((this.max.y - this.min.y) / 2.0) + this.min.y,
+        };
+    },
+};
+
+/**
  * Platformer GLobal Game Functions (preload, create, update)
  */
 Platformer.preload = function() {
@@ -117,11 +152,17 @@ Platformer.loadMessageData = function(callback) {
     else {
         Platformer.cache.messageData = [
             {
-                onion: {pos: {x: 5, y: 4}, color: "#FF0000"},
+                onion: {
+                    path: [
+                        {x: 210, y: 160},
+                        {x: 220, y: 170},
+                        {x: 230, y: 180},
+                        {x: 240, y: 190},
+                        {x: 250, y: 200},
+                    ],
+                    color: "#FF0000",
+                },
                 message: String.fromCodePoint(0x1F601),
-            },
-            {
-                onion: {pos: {x: 0, y: 0}, color: "#0FFF00"},
             },
         ];
 
@@ -147,9 +188,9 @@ Platformer.getFontStyle = function(color) {
  *
  * [TODO] Push the data also to the server
  */
-Platformer.pushOnionData = function(pos, color, msg) {
+Platformer.pushOnionData = function(path, color, msg) {
     var onion = {
-        onion: {pos: pos, color: color},
+        onion: {path: path, color: color},
         msg: msg
     };
 
@@ -428,18 +469,26 @@ Platformer.World.prototype = {
     },
 
     addOnion: function(data) {
-        var pos = Platformer.World.getPos(
-            data.onion.pos.x, data.onion.pos.y);
-        var square = Platformer.createSquare(
-            pos, data.onion.color + "90",
-            Platformer.playerScale);
+        var c = data.onion.path.length;
+        var step = 1.0 / c;
+        var bounds = new Platformer.Bounds();
 
-        square.body.allowGravity = false;
-        square.body.immovable = true;
+        for(var i = 0; i < c; ++i) {
+            var alpha = ((step + (step * i)) * 125).toString(16).substr(0,2);
+            var pos = data.onion.path[i];
+            bounds.addPos(pos);
+            var square = Platformer.createSquare(
+                pos, data.onion.color + alpha,
+                Platformer.playerScale);
+
+            square.body.allowGravity = false;
+            square.body.immovable = true;
+        }
 
         if(data.message) {
+            var msgPos = bounds.computeCenter();
             var text = Platformer.game.add.text(
-                pos.x, pos.y - (Platformer.unit / 2),
+                msgPos.x, msgPos.y - (Platformer.unit / 1.25),
                 data.message,
                 Platformer.getFontStyle(data.onion.color));
 
@@ -466,7 +515,7 @@ Platformer.World.prototype = {
         console.log("DIE!");
         // todo: MSG SELECT LOGIC
         Platformer.pushOnionData(
-            Platformer.World.getJsonPos(player.getPos()),
+            player.getPath(),
             player.color);
         Platformer.game.state.start("DeadState");
     },
@@ -484,6 +533,8 @@ Platformer.Player = function(pos) {
     this.color = "#FFFF00";
     this.square = Platformer.createSquare(
         pos, this.color, Platformer.playerScale);
+
+    this.recorder = new Platformer.MovementRecorder(pos);
 
     Platformer.game.camera.follow(this.square);
 
@@ -511,6 +562,11 @@ Platformer.Player.prototype = {
         {
             this.square.body.velocity.y = -Platformer.speed.jump;
         }
+
+        this.recorder.addPos({
+            x: this.square.x,
+            y: this.square.y,
+        });
     },
 
     getPos: function() {
@@ -520,9 +576,75 @@ Platformer.Player.prototype = {
         };
     },
 
+    getPath: function() {
+        return this.recorder.getPath();
+    },
+
     collide: function(other, callback) {
         if(Platformer.game.physics.arcade.collide(this.square, other) && callback) {
             callback(this);
         }
     }
+};
+
+/**
+ * A simple MovementRecorder Class
+ */
+var __MAX_MOVEMENT_POS = 8;
+var __MIN_MOVEMENT_DISTANCE = Math.pow(Platformer.unit / 3, 2);
+Platformer.MovementRecorder = function(pos) {
+    this.path = [];
+    this.last = null;
+
+    if(pos) {
+        this.addPos(pos);
+    }
+};
+
+Platformer.MovementRecorder.prototype = {
+    addPos: function(pos) {
+        if(pos == null) return;
+        // if the pos is to close, we'll skip it,
+        // but store it either way, as we do want it in the end,
+        // in case it is the last one
+        if(!this.__checkPos(pos)) {
+            this.last = pos;
+            return;
+        }
+
+        this.last = null;
+        this.__addPos(pos);
+    },
+
+    getPath: function() {
+        // if we have a last one, we'll use it... ?! :)
+        if(this.last) {
+            this.__addPos(this.last);
+            this.last = null;
+        }
+
+        return this.path;
+    },
+
+    __addPos: function(pos) {
+        // if we are over the limit, we drop the oldest
+        if(this.path.length == __MAX_MOVEMENT_POS) {
+            this.path.shift();
+        }
+
+        // and finally add the new one
+        this.path.push(pos);
+    },
+
+    // if the pos is too close we don't want it!
+    __checkPos: function(pos) {
+        if(this.path.length == 0) {
+            return true;
+        }
+
+        var previous = this.path[this.path.length-1];
+        var distance = Math.pow(pos.x - previous.x, 2) +
+            Math.pow(pos.y - previous.y, 2);
+        return distance >= __MIN_MOVEMENT_DISTANCE;
+    },
 };
