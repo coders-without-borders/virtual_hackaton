@@ -22,7 +22,7 @@ app.use('/client', express.static('../client'));
 app.use('/node_modules', express.static('../node_modules'));
 
 app.get('/', function (req, res) {
-	res.redirect('/client/tests/platformer.html');
+	res.redirect('/client/index.html');
 });
 
 app.use('/world', wg.router);

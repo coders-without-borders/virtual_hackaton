@@ -270,7 +270,11 @@ var DeadState = function(){};
 DeadState.prototype = {
   	preload: function() {
         this.continueButton = Platformer.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        Platformer.ui.factory('dead').show();
+        this.ui = Platformer.ui.factory('dead').show();
+		this.ui.element("submit").submit(function() {
+			console.log("PRESSED SUBMIT");
+            Platformer.game.state.start("LoadState");
+		});
     },
     update: function() {
         if(this.continueButton.isDown) {
@@ -278,7 +282,7 @@ DeadState.prototype = {
         }
     },
     shutdown: function() {
-        Platformer.ui.factory('dead').hide();
+        this.ui.hide();
     },
 };
 

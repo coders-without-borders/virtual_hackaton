@@ -1,0 +1,124 @@
+
+body, canvas {
+    padding: 0;
+    margin: 0;
+}
+
+#ui { position: relative; }
+
+.uiScreen {
+	background: white;
+	color: black;
+	position: absolute;
+}
+
+#ui {
+	font-family: 'Rubik', sans;
+	font-size: 14pt;
+}
+
+#ui pre {
+	font-family: 'Inconsolata', serif;
+}
+
+#ui .ui {
+	display: none;
+	visibility: hidden;
+}
+
+#ui h1 {
+	font-family: 'Chewy', sans;
+	background: #990000;
+	font-size: 28pt;
+	padding: 0.5em;
+	margin: 0;
+	color: white;
+}
+
+#ui_dead .radioButtons label {
+	float: left;
+	width: 80px;
+	margin: 4px;
+	background: #EFEFEF;
+	border-radius: 1px;
+	border: 1px solid #d0d0d0;
+	overflow: auto;
+}
+
+#ui_dead .radioButtons .emoteBtn input + span {
+	background: #FFF673;
+	border-color: #FFE373;
+}
+
+#ui_dead .radioButtons .emoteBtn input:checked + span {
+	border-color: #30210C;
+    background-color: #59380A;
+    color: #F7F7F7;
+}
+
+#ui_dead .radioButtons .levelBtn {
+	margin: 0;
+	width: 100%;
+	margin: 0.2em 0 0 0;
+}
+
+#ui_dead .radioButtons .levelBtn span {
+	font-size: 14pt;
+	padding: 0.25em;
+}
+
+div.center {
+	text-align: center;
+}
+
+#ui form {
+	padding: 1em;
+}
+
+#ui .fieldset {
+	background: #eee;
+	border: 0;
+	margin: 0.5em 0 1em 0;
+	padding: 0.5em;
+	border-radius: 8px;
+	min-width: 0;
+	overflow: auto;
+}
+
+#ui_dead .fieldset .legend {
+}
+
+#ui_dead .radioButtons label span {
+	text-align: center;
+	font-size: 32pt;
+	padding: 13px 0px;
+	display: block;
+}
+
+#ui_dead .radioButtons input {
+	display: none;
+}
+
+#ui_dead .radioButtons input:checked + span {
+    background-color: #404040;
+    color: #F7F7F7;
+}
+
+#ui .labelAbove {
+	margin: 1em;
+	text-align: center;
+	display: block;
+}
+
+#ui .bigButton {
+	border: 0;
+	background: #A3D900;
+	color: #fff;
+
+	font-family: 'Chewy';
+	
+	display: inline-block;
+	font-size: 24pt;
+	padding: 0.5em;
+	border-radius: 1px;
+}

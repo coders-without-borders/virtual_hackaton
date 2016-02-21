@@ -17,6 +17,10 @@
 		if(!ele)
 			return null;
 
+		ele.element = function(name) {
+			return $(ele, "#" + name);
+		};
+
 		ele.show = function() {
 			const win = $(window);
 			const left = Math.max(0, ((win.width() - ele.outerWidth()) / 2) + win.scrollLeft()) + "px";
@@ -30,6 +34,8 @@
 				top: top,
 				zIndex: 100,
 			});
+
+			return ele;
 		};
 
 		ele.hide = function() {
@@ -38,6 +44,8 @@
 				visibility: 'hidden',
 				zIndex: 0,
 			});
+
+			return ele;
 		}
 
 		return ele;
