@@ -388,7 +388,7 @@ WorldGenerator.prototype.generateLevel = function(opts) {
 						color: commit.color,
 						id: commit.sha,
 						master: commit.isMaster,
-						avatar: commit.author.avatar_url,
+						avatar: commit.author ? commit.author.avatar_url : '',
 						author: commit.commit.author.name,
 						message: commit.commit.message,
 					});

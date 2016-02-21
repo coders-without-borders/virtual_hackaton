@@ -660,9 +660,12 @@ Platformer.World.prototype = {
     },
 
     update: function() {
+		var self = this;
+
+		this.commitAssignedThisFrame = false;
         this.player.collide(this.obstacles, this.onPlayerDie);
         this.player.collide(this.goals, this.onPlayerReachGoal);
-        this.player.collide(this.platforms, this.onPlayerTouchedPlatform);
+        this.player.collide(this.platforms, function (a, b) { self.onPlayerTouchedPlatform(a, b) });
         this.player.update();
 
         // Check if we're not outside the level (dead)
@@ -676,8 +679,8 @@ Platformer.World.prototype = {
 
     onPlayerDie: function(player) {
         Platformer.cachePlayerOnion(
-            player.getPath(),
-            player.color);
+            player.player.getPath(),
+            player.player.color);
 
         Platformer.game.state.start("DeadState");
     },
@@ -690,19 +693,22 @@ Platformer.World.prototype = {
     },
 
 	onPlayerTouchedPlatform: function(player, platform) {
-		if(!Platformer.ui || !platform.platformData)
+		if(this.commitAssignedThisFrame || !Platformer.ui || !platform.platformData)
 			return;
+
+		var data = platform.platformData;
 		
-		if(player.lastPlatform != platform) {
-			player.lastPlatform = platform;
+		if(player.lastPlatform != data.id) {
+			player.lastPlatform = data.id;
+			this.commitAssignedThisFrame = true;
 
 			var ui = Platformer.ui.factory("left");
 			var commit = ui.element("commitArea");
 			
-			commit.find('#authorImg').attr('src', platform.platformData.avatar);
-			commit.find('#author').text(platform.platformData.author);
-			commit.find('#commitSha').text(platform.platformData.id);
-			commit.find('#commitMsg').text(platform.platformData.message);
+			commit.find('#authorImg').attr('src', data.avatar);
+			commit.find('#author').text(data.author);
+			commit.find('#commitSha').text(data.id);
+			commit.find('#commitMsg').text(data.message);
 			commit.css({
 				visibility: 'visible',
 			}).show();
