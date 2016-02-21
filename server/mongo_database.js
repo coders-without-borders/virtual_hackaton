@@ -16,35 +16,78 @@
       });
     }
 
+    function checkForSpam(fingerprint, type, delay, callback)
+    {
+        var collection = database.collection('user_actions');
+
+        var record = collection.find({fingerprint: fingerprint, type: type});
+        record.toArray(function(err, result) {
+            if ( err ) {
+                console.log(err);
+            }
+            else {
+                var isOK = true;
+                var curDate = new Date();
+                if(result.length > 0) {
+                    var prevDate = result[result.length-1].date;
+                    if (curDate < prevDate) {
+                        curDate.setDate(curDate.getDate() + 1);
+                    }
+
+                    var msec = curDate - prevDate;
+                    isOK = msec > delay;
+                }
+
+                if(isOK) {
+                    var action = {
+                        fingerprint: fingerprint,
+                        type: type,
+                        date: curDate,
+                    };
+                    database.collection('user_actions').insertOne( action, function( err, result ) {
+                        if ( err ) {
+                            console.log(err);
+                        } else {
+                            console.log("Inserted user action");
+                            callback();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
     function addOnionSkin( req, res )
     {
         var data = req.body;
         var onionData = data.onion;
         var id = data.id;
-        console.log(id);
-        /* onion data should be in the form of:
-        {
-            color: "#aabbcc",
-            path: [ {x: 10, y: 20 }, {x: 12, y: 20 } ],
-            message: 244234, // optional
-        }
-        */
-        console.log("Inserting:");
-        console.log(onionData);
 
-        for (var i = 0; i < onionData.path.length; i++) {
-            onionData.path[i].x = parseInt(onionData.path[i].x);
-            onionData.path[i].y = parseInt(onionData.path[i].y);
-        }
-
-        database.collection('onion_skin').insertOne( onionData, function( err, result ) {
-            if ( err ) {
-                console.log(err);
-            } else {
-                console.log("Inserted onion shell");
+        checkForSpam(id, "add_onion", 3000, function() {
+            /* onion data should be in the form of:
+            {
+                color: "#aabbcc",
+                path: [ {x: 10, y: 20 }, {x: 12, y: 20 } ],
+                message: 244234, // optional
             }
-            res.send("");
-        } );
+            */
+            console.log("Inserting:");
+            console.log(onionData);
+
+            for (var i = 0; i < onionData.path.length; i++) {
+                onionData.path[i].x = parseInt(onionData.path[i].x);
+                onionData.path[i].y = parseInt(onionData.path[i].y);
+            }
+
+            database.collection('onion_skin').insertOne( onionData, function( err, result ) {
+                if ( err ) {
+                    console.log(err);
+                } else {
+                    console.log("Inserted onion shell");
+                }
+                res.send("");
+            } );
+        });
     }
 
     function getVisibleOnionSkins( req, res ) {
@@ -71,25 +114,29 @@
     function getLastOnionSkins( req, res ) {
         var results = [];
         var count = parseInt(req.query.count);
-        var id = req.query.id;
-        console.log(id);
 
         var collection = database.collection('onion_skin');
-        var total = collection.find().count();
-        var skip = 0;
-        if(total > count) {
-            skip = total - count;
-        }
-
-        var last = collection
-            .find({}, {_id: 0, path: 1, color: 1, message: 1 })
-            .skip(skip);
-
-        last.toArray(function(err, result) {
-            if ( err ) {
+        collection.find().count(function(err, total) {
+            if(err) {
                 console.log(err);
-            } else {
-                res.json({ results: result });
+            }
+            else {
+                var skip = 0;
+                if(total > count) {
+                    skip = total - count;
+                }
+
+                var last = collection
+                    .find({}, {_id: 0, path: 1, color: 1, message: 1 })
+                    .skip(skip);
+
+                last.toArray(function(err, result) {
+                    if ( err ) {
+                        console.log(err);
+                    } else {
+                        res.json({ results: result });
+                    }
+                });
             }
         });
     }

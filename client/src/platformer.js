@@ -168,19 +168,16 @@ Platformer.loadLevelData = function(callback) {
  *   + Pull the actual message data from the server
  */
 Platformer.loadMessageData = function(callback) {
-    Platformer.getFingerprint(function(fingerprint) {
-        $.ajax({
-            'url' : '/onion_skin/get_last',
-            'type' : 'GET',
-            'data' : {
-                'count' : Platformer.maxOnionSkins,
-                'id': fingerprint,
-            },
-            'success' : function(response) {
-                Platformer.cache.messageData = response.results;
-                callback();
-            },
-        });
+    $.ajax({
+        'url' : '/onion_skin/get_last',
+        'type' : 'GET',
+        'data' : {
+            'count' : Platformer.maxOnionSkins,
+        },
+        'success' : function(response) {
+            Platformer.cache.messageData = response.results;
+            callback();
+        },
     });
 };
 
@@ -362,10 +359,10 @@ DeadState.prototype = {
 				.then(function(repos) {
 					var target = self.ui.element("voteFields");
 					target.html('');
-					
+
 					$.each(repos.rows, function() {
 						var data = { repo: this.repo, user: this.username };
-						
+
 						var repoSpan = $('<span/>').addClass('repoUserName').text(data.user + '/');
 						var span = $('<span/>').append(repoSpan).append(document.createTextNode(data.repo));
 						var input = $('<input type="radio" name="nextLevel"/>').val(JSON.stringify(data));
@@ -375,7 +372,7 @@ DeadState.prototype = {
 					self.ui.element("spinner").hide();
 					self.ui.element("voteFields").show();
 				});
-			
+
 			this.ui.element("deadForm").submit(function() {
 				self.finishScreen();
 				return false;
@@ -392,8 +389,8 @@ DeadState.prototype = {
 			var customRepo = this.ui.element("customLevel").val();
 			var vote = this.ui.activeRadio("nextLevel").val()
 
-			
-			
+
+
 			if(customRepo) {
 				var parts = customRepo.split('/');
 				if(parts.length == 2) {
@@ -411,7 +408,7 @@ DeadState.prototype = {
 					});
 			}
 		}
-		
+
         Platformer.submitOnionData(message);
         Platformer.game.state.start("LoadState");
 	},
