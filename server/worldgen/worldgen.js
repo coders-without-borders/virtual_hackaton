@@ -342,5 +342,6 @@ WorldGenerator.prototype.generateLevel = function(opts) {
 		return result;
 	}).catch(function(e) {
 		console.log(e, e.stack);
+		throw e;
 	});
 };

@@ -3,11 +3,12 @@ var express = require('express');
 var sqlite_database = require('./sqlite_database.js');
 var mongo_database = require('./mongo_database.js');
 var votes = require("./votes.js");
-const worldgen = require('./worldgen/worldgen');
+const WorldGenAPI = require('./worldgen/api');
 const yargs = require('yargs');
 
 var args = yargs.argv;
 var app = express();
+var wg = new WorldGenAPI(args);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -21,28 +22,7 @@ app.get('/', function (req, res) {
   res.send('The backend server');
 });
 
-app.get('/world/:user/:repo', function (req, res) {
-	const wg = new worldgen.WorldGenerator({
-	});
-
-	if(args.githubToken) {
-		wg.github.authenticate({
-			type: "oauth",
-			token: args.githubToken
-		});
-	}
-
-	wg.generateLevel({
-		user: req.params.user,
-		repo: req.params.repo,
-	}).then(function(levelData) {
-		res.send(levelData);
-	}).catch(function(e) {
-		console.log(e, e.stack.split('\n'));
-		res.status(500).send('error generating level');
-	});
-	
-});
+app.use('/world', wg.router);
 
 app.post('/votes/vote_for_repo', votes.vote_for_repo );
 app.get('/votes/get_top_repos', votes.get_top_repos);
