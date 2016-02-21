@@ -5,20 +5,42 @@
         <title>Platformer test</title>
         <script src="../../node_modules/phaser/build/phaser.min.js"></script>
         <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="../src/ui.js"></script>
         <script src="../src/platformer.js"></script>
         <style>
             body, canvas {
                 padding: 0;
                 margin: 0;
             }
+
+			#ui { position: relative; }
+
+			.uiScreen {
+			    background: white;
+			    color: black;
+			    position: absolute;
+			    visibility: hidden;
+			};
+			
+			#ui .ui {
+			    display: none;
+			    visibility: hidden;
+			};
         </style>
     </head>
     <body>
+	  <div id="ui">
+		<div id="ui_dead" class="ui uiScreen">
+		  DEADUI
+		</div>
+	  </div>
 
     <script type="text/javascript">
 
     $(function() {
-        Platformer.game = new Phaser.Game(
+        Platformer.ui = new UI($('#ui'));
+	
+	    Platformer.game = new Phaser.Game(
             "100%", "100%", Phaser.AUTO, 'Game',
             { preload: preload, create: create, update: update });
 

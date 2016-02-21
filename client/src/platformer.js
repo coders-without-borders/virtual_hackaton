@@ -437,6 +437,8 @@ Platformer.World.prototype = {
             Platformer.World.getJsonPos(player.getPos()),
             player.color);
         Platformer.game.state.start("LoadState");
+
+		Platformer.ui.factory('dead').show();
     },
 
     onPlayerReachGoal: function() {
