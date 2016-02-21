@@ -5,14 +5,14 @@
  * prototypes, global values and helper functions
  */
 var Platformer = Platformer || {
-    unit: 35.0,
-    playerScale: 0.65,
+    unit: 50.0,
+    playerScale: 0.45,
     game: null,
-    gravity: 425,
+    gravity: 50.0 * 13.5,
     padding: 100,
     speed: {
-        walk: 115,
-        jump: 245,
+        walk: 50 * 4.3,
+        jump: 50 * 8.4,
     },
     cache: {},
 };
@@ -42,10 +42,13 @@ Platformer.create = function() {
     window.Platformer = Platformer;
     Platformer.game.physics.startSystem(Phaser.Physics.ARCADE);
     Platformer.game.physics.arcade.gravity.y = Platformer.gravity;
+    Platformer.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+    Platformer.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 
     Platformer.game.state.add("LevelState", LevelState);
     Platformer.game.state.add("LoadState", LoadState);
     Platformer.game.state.start("LoadState");
+    Platformer.game.scale.refresh();
 };
 
 Platformer.update = function() {

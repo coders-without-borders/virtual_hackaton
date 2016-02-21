@@ -6,6 +6,12 @@
         <script src="../../node_modules/phaser/build/phaser.min.js"></script>
         <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
         <script src="../src/platformer.js"></script>
+        <style>
+            body, canvas {
+                padding: 0;
+                margin: 0;
+            }
+        </style>
     </head>
     <body>
 
@@ -13,7 +19,7 @@
 
     $(function() {
         Platformer.game = new Phaser.Game(
-            400, 400, Phaser.AUTO, 'Game',
+            "100%", "100%", Phaser.AUTO, 'Game',
             { preload: preload, create: create, update: update });
 
         function preload () {
