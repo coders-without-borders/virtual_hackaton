@@ -23,14 +23,24 @@ Platformer.Color = function(r, g, b, a) {
     this.r = r;
     this.g = g;
     this.b = b;
-    this.a = a || 255;
+    this.a = (a || 255) / 255.0;
 };
 
 /**
  * A static function to go from a hex string to a color object
  */
 Platformer.Color.fromHex = function(hex) {
-    var bigint = parseInt(hex.substr(1), 16);
+    var bigint = 0;
+    if(hex.substr(0,2).toLowerCase() == "0x") {
+        bigint = parseInt(hex.substr(2), 16);
+    }
+    else if(hex.substr(0,1) == "#") {
+        bigint = parseInt(hex.substr(1), 16);
+    }
+    else {
+        bigint = parseInt(hex, 16);
+    }
+
     var values = [
         (bigint >> 24) & 255,
         (bigint >> 16) & 255,
@@ -108,7 +118,7 @@ Platformer.loadMessageData = function(callback) {
         Platformer.cache.messageData = [
             {
                 onion: {pos: {x: 5, y: 4}, color: "#FF0000"},
-                message: 1,
+                message: String.fromCodePoint(0x1F601),
             },
             {
                 onion: {pos: {x: 0, y: 0}, color: "#0FFF00"},
@@ -120,24 +130,12 @@ Platformer.loadMessageData = function(callback) {
 };
 
 /**
- * A simple helper function to retrieve a message string
- * based on a message id
- */
-Platformer.getMessage = function(id) {
-    if(id == 1) {
-        return "Hello, Message!";
-    }
-
-    return "Err...";
-};
-
-/**
  * Create the font style based on mostly common style parameters.
  * Note: this function should only be used for onion messages!
  */
 Platformer.getFontStyle = function(color) {
     return {
-        font: (Platformer.unit * 0.25) + "px Arial",
+        font: (Platformer.unit * 0.5) + "px Arial",
         fill: color,
         align: "center",
     };
@@ -442,7 +440,7 @@ Platformer.World.prototype = {
         if(data.message) {
             var text = Platformer.game.add.text(
                 pos.x, pos.y - (Platformer.unit / 2),
-                Platformer.getMessage(data.message),
+                data.message,
                 Platformer.getFontStyle(data.onion.color));
 
                 text.anchor.set(0.5);
