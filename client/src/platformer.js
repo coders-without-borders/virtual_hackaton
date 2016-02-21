@@ -272,8 +272,8 @@ DeadState.prototype = {
         this.continueButton = Platformer.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         this.ui = Platformer.ui.factory('dead').show();
 		this.ui.element("submit").submit(function() {
-			console.log("PRESSED SUBMIT");
             Platformer.game.state.start("LoadState");
+			return false;
 		});
     },
     update: function() {
