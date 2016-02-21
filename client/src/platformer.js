@@ -285,19 +285,23 @@ LevelState.prototype = {
 var DeadState = function(){};
 DeadState.prototype = {
   	preload: function() {
+		const self = this;
         this.continueButton = Platformer.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
 		if(Platformer.ui) {
 			this.ui = Platformer.ui.factory('dead').show();
 			this.ui.element("submit").submit(function() {
-				Platformer.game.state.start("LoadState");
+				self.finishScreen();
 				return false;
 			});
 		}
     },
+	finishScreen: function() {
+        Platformer.game.state.start("LoadState");
+	},
     update: function() {
         if(this.continueButton.isDown) {
-            Platformer.game.state.start("LoadState");
+			this.finishScreen();
         }
     },
     shutdown: function() {
@@ -314,7 +318,27 @@ var ResultState = function(){};
 ResultState.prototype = {
     // [TODO] Implementation
   	preload: function() {
+		const self = this;
+        this.continueButton = Platformer.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+		if(Platformer.ui) {
+			this.ui = Platformer.ui.factory('won').show();
+			this.ui.element("submit").submit(function() {
+				self.finishScreen();
+				return false;
+			});
+		}
+    },
+	finishScreen: function() {
         Platformer.game.state.start("LoadState");
+	},
+    update: function() {
+        if(this.continueButton.isDown) {
+        }
+    },
+    shutdown: function() {
+		if(this.ui)
+			this.ui.hide();
     },
 };
 
