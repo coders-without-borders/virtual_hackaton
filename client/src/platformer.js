@@ -82,7 +82,7 @@ Platformer.loadLevelData = function(callback) {
         callback();
     }
     else {
-        var levelURL = "http://localhost:3000/world/rust-lang/rust";
+        var levelURL = "http://localhost:3000/world/levelData";
         $.getJSON(levelURL).then(function(levelData) {
             Platformer.cache.levelData = levelData;
             callback();
