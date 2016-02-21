@@ -634,7 +634,7 @@ Platformer.World.prototype = {
 
         square.body.allowGravity = false;
         square.body.immovable = true;
-        Platformer.game.add.tween(square.scale).to( { x: 0.8, y: 0.8 }, 1000, Phaser.Easing.Linear.None, true, 0, -1);
+        Platformer.game.add.tween(square.scale).to( { x: 0.8, y: 0.8 }, 1000, Phaser.Easing.Linear.None, true, 0, -1, true);
 
         this.goals.add(square);
     },
