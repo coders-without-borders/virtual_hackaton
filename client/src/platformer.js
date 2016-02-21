@@ -147,16 +147,11 @@ Platformer.getFingerprint = function(callback) {
  * We maintain a cached version to prevent loading everytime we die.
  */
 Platformer.loadLevelData = function(callback) {
-    if(Platformer.cache.levelData) {
+    var levelURL = "/world/levelData";
+    $.getJSON(levelURL).then(function(levelData) {
+        Platformer.cache.levelData = levelData;
         callback();
-    }
-    else {
-        var levelURL = "/world/levelData";
-        $.getJSON(levelURL).then(function(levelData) {
-            Platformer.cache.levelData = levelData;
-            callback();
-        });
-    }
+    });
 };
 
 /**
