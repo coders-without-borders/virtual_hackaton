@@ -63,6 +63,8 @@ Platformer.create = function() {
 
     Platformer.game.state.add("LevelState", LevelState);
     Platformer.game.state.add("LoadState", LoadState);
+    Platformer.game.state.add("DeadState", DeadState);
+    Platformer.game.state.add("ResultState", ResultState);
     Platformer.game.state.start("LoadState");
     Platformer.game.scale.refresh();
 };
@@ -218,6 +220,38 @@ LevelState.prototype = {
 	},
     update: function() {
         this.planet.update();
+    },
+};
+
+/**
+ * The DeadState contains the screen content for when you're dead.
+ * This is empty as we now use a normal HTML5 UI;
+ */
+var DeadState = function(){};
+DeadState.prototype = {
+  	preload: function() {
+        this.continueButton = Platformer.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        Platformer.ui.factory('dead').show();
+    },
+    update: function() {
+        if(this.continueButton.isDown) {
+            Platformer.game.state.start("LoadState");
+        }
+    },
+    shutdown: function() {
+        Platformer.ui.factory('dead').hide();
+    },
+};
+
+/**
+ * The Result State contains the screen content for when the game is over.
+ * This is empty as we now use a normal HTML5 UI;
+ */
+var ResultState = function(){};
+ResultState.prototype = {
+    // [TODO] Implementation
+  	preload: function() {
+        Platformer.game.state.start("LoadState");
     },
 };
 
@@ -436,14 +470,12 @@ Platformer.World.prototype = {
         Platformer.pushOnionData(
             Platformer.World.getJsonPos(player.getPos()),
             player.color);
-        Platformer.game.state.start("LoadState");
-
-		Platformer.ui.factory('dead').show();
+        Platformer.game.state.start("DeadState");
     },
 
     onPlayerReachGoal: function() {
         console.log("WIN!");
-        Platformer.game.state.start("LoadState");
+        Platformer.game.state.start("ResultState");
     },
 };
 

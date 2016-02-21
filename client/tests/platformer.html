@@ -20,7 +20,7 @@
 			    color: black;
 			    position: absolute;
 			}
-			
+
 			#ui .ui {
 			    display: none;
 			    visibility: hidden;
@@ -31,6 +31,7 @@
 	  <div id="ui">
 		<div id="ui_dead" class="ui uiScreen">
 		  DEADUI
+          <p>PRESS SPACE TO CONTINUE</p>
 		</div>
 	  </div>
 
@@ -38,7 +39,7 @@
 
     $(function() {
         Platformer.ui = new UI($('#ui'));
-	
+
 	    Platformer.game = new Phaser.Game(
             "100%", "100%", Phaser.AUTO, 'Game',
             { preload: preload, create: create, update: update });

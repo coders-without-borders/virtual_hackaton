@@ -31,7 +31,16 @@
 				zIndex: 100,
 			});
 		};
+
+		ele.hide = function() {
+			ele.css({
+				display: 'none',
+				visibility: 'hidden',
+				zIndex: 0,
+			});
+		}
+
 		return ele;
 	};
-	
+
 })(jQuery);
