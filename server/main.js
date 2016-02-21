@@ -38,6 +38,7 @@ app.post('/nextLevel', function(req, res) {
 		console.log('Next level:', repo.username, repo.repo, 'with', repo.votes, 'votes');
 
 		votes.reset_votes();
+		mongo_database.dropOnionSkins();
 		wg.triggerNextLevel({
 			user: repo.username,
 			repo: repo.repo,
