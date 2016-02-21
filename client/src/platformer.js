@@ -307,10 +307,10 @@ LevelState.prototype = {
 			.then(function(repos) {
 				var target = self.leftSidebar.element("voteList");
 				target.html('');
-				
+
 				$.each(repos.rows, function() {
 					var data = { repo: this.repo, user: this.username, votes: this.votes };
-						
+
 					var repoSpan = $('<span/>').addClass('repoUserName').text(data.user + '/');
 					var icon = $('<span class="iconTick"/>');
 					var span = $('<span/>')
@@ -323,7 +323,7 @@ LevelState.prototype = {
 				self.leftSidebar.element('voteArea').css({
 					visibility: 'visible',
 				});
-	
+
 				self.refreshTimeout = setTimeout(function() {
 					self.refreshTimeout = null;
 					self.refresh();
@@ -530,7 +530,7 @@ Platformer.World.prototype = {
     addSpinner: function(x, y) {
         var pos = Platformer.World.getPos(x, y);
 
-        var radius = Platformer.unit * 2;
+        var radius = Platformer.unit * 1.98;
         var speed = 0.075;
         if(Math.floor(Math.random() * 10) < 5) {
             speed *= -1;
@@ -563,7 +563,7 @@ Platformer.World.prototype = {
     addMover: function(x, y) {
         var pos = Platformer.World.getPos(x, y);
 
-        var radius = Platformer.unit * 2;
+        var radius = Platformer.unit * 1.98;
         var speed = 0.075;
         if(Math.floor(Math.random() * 10) < 5) {
             speed *= -1;
