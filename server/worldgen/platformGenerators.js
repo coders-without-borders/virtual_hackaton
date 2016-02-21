@@ -25,7 +25,7 @@ function easyStraightLine(levelData, platforms) {
 function miniCluster(levelData, platforms) {
 	var count = Math.min(platforms.length, levelData.random.integer({min: 8, max: 16}));
 
-	if(count <= 0)
+	if(count <= 4)
 		return;
 
 	var lastPos = platforms[0].prev ? platforms[0].prev.position : [0, 0];

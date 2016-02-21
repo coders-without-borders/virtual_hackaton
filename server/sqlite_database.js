@@ -1,8 +1,10 @@
 (function() {
     var sqlite3 = require('sqlite3');
 
-    function initialize()
+    function initialize(config)
     {
+		config = config || {};
+		
         db = new sqlite3.Database('db.sqlite', sqlite3.OPEN_READWRITE,
             function(err)
             {

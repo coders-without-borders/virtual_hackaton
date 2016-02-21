@@ -4,7 +4,9 @@ var sqlite_database = require('./sqlite_database.js');
 var mongo_database = require('./mongo_database.js');
 var votes = require("./votes.js");
 const worldgen = require('./worldgen/worldgen');
+const yargs = require('yargs');
 
+var args = yargs.argv;
 var app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -22,6 +24,13 @@ app.get('/', function (req, res) {
 app.get('/world/:user/:repo', function (req, res) {
 	const wg = new worldgen.WorldGenerator({
 	});
+
+	if(args.githubToken) {
+		wg.github.authenticate({
+			type: "oauth",
+			token: args.githubToken
+		});
+	}
 
 	wg.generateLevel({
 		user: req.params.user,
@@ -42,8 +51,8 @@ app.post('/onion_skin/drop', mongo_database.dropOnionSkins);
 app.post('/onion_skin/add', mongo_database.addOnionSkin);
 app.post('/onion_skin/get_visible', mongo_database.getVisibleOnionSkins);
 
-sqlite_database.initialize();
-mongo_database.initialize();
+sqlite_database.initialize(args);
+mongo_database.initialize(args);
 
 var server = app.listen(3000, function() {
     console.log("server listening on port 3000");

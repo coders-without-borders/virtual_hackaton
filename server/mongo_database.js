@@ -1,9 +1,11 @@
 (function(){
     var mongoClient = require('mongodb').MongoClient;
     var database;
-    function initialize()
+    function initialize(config)
     {
-        var url = 'mongodb://localhost:1111/player';
+		config = config || {};
+		
+        var url = config.mongoDb || 'mongodb://localhost:1111/player';
         mongoClient.connect(url, function(err, db) {
           if( err ) {
               console.log(err);
