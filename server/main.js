@@ -18,8 +18,11 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.use('/client', express.static('../client'));
+app.use('/node_modules', express.static('../node_modules'));
+
 app.get('/', function (req, res) {
-  res.send('The backend server');
+	res.redirect('/client/tests/platformer.html');
 });
 
 app.use('/world', wg.router);

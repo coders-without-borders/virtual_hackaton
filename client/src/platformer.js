@@ -82,7 +82,7 @@ Platformer.loadLevelData = function(callback) {
         callback();
     }
     else {
-        var levelURL = "http://localhost:3000/world/levelData";
+        var levelURL = "/world/levelData";
         $.getJSON(levelURL).then(function(levelData) {
             Platformer.cache.levelData = levelData;
             callback();
