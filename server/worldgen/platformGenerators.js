@@ -1,3 +1,7 @@
+Math.trunc = Math.trunc || function(x) {
+  return x < 0 ? Math.ceil(x) : Math.floor(x);
+};
+
 function easyStraightLine(levelData, platforms) {
 	var count = Math.min(platforms.length, levelData.random.integer({min: 3, max: 5}));
 	var angle = levelData.random.floating({min: -Math.PI*0.4, max: Math.PI*0.2});
@@ -7,11 +11,11 @@ function easyStraightLine(levelData, platforms) {
 		return;
 
 	var lastPos = platforms[0].prev ? platforms[0].prev.position : [0, 0];
-	
+
 	while(count > 0) {
 		var commit = platforms.splice(0,1)[0];
 		count -= 1;
-		
+
 		lastPos = commit.prev ? commit.prev.position : [0, 0];
 
 		var nextPos = [
@@ -20,7 +24,7 @@ function easyStraightLine(levelData, platforms) {
 		commit.position = nextPos;
 		lastPos = nextPos;
 	}
-};
+}
 
 function miniCluster(levelData, platforms) {
 	var count = Math.min(platforms.length, levelData.random.integer({min: 8, max: 16}));
@@ -29,14 +33,14 @@ function miniCluster(levelData, platforms) {
 		return;
 
 	var lastPos = platforms[0].prev ? platforms[0].prev.position : [0, 0];
-	
+
 	while(count > 0) {
 		var commit = platforms.splice(0,1)[0];
 		count -= 1;
-		
+
 		var angle = levelData.random.floating({min: 0, max: Math.PI*2});
 		var dist = levelData.random.floating({min: 2.5, max: 5.5});
-		
+
 		lastPos = commit.prev ? commit.prev.position : [0, 0];
 
 		var nextPos = [
@@ -45,7 +49,7 @@ function miniCluster(levelData, platforms) {
 		commit.position = nextPos;
 		commit.width = 1;
 		commit.height = 1;
-		
+
 		lastPos = nextPos;
 	}
 };
@@ -55,7 +59,7 @@ function loneSpinner(levelData, platforms) {
 
 	var angle = levelData.random.floating({min: -Math.PI*0.25, max: Math.PI*0.25});
 	var dist = 6;
-	
+
 	var pointA = platform.prev ? platform.prev.position : [0, 0];
 	var pointB = [
 		Math.trunc(pointA[0] + Math.cos(angle)*dist),
@@ -74,7 +78,7 @@ function moverPlatform(levelData, platforms) {
 
 	var angle = levelData.random.floating({min: -Math.PI*0.1, max: Math.PI*.2});
 	var dist = 6;
-	
+
 	var pointA = platform.prev ? platform.prev.position : [0, 0];
 	var pointB = [
 		Math.trunc(pointA[0] + Math.cos(angle)*dist),

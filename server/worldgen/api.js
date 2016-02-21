@@ -33,7 +33,7 @@ WorldGenAPI.prototype.getLevelData = function() {
 	
 	if(this.levelGenPromise)
 		return this.levelGenPromise;
-	
+
 	if(this.currentLevel)
 		return Promise.resolve(this.currentLevel);
 
@@ -61,7 +61,7 @@ WorldGenAPI.prototype.triggerNextLevel = function(level) {
 // Routing
 WorldGenAPI.prototype.setupRoutes = function() {
 	const self = this;
-	
+
 	self.router.get('/levelData', function(req, res) {
 		self.getLevelData().then(function(levelData) {
 			res.send(levelData);
@@ -76,7 +76,7 @@ WorldGenAPI.prototype.setupRoutes = function() {
 		self.triggerNextLevel({ user: req.params.user, repo: req.params.repo });
 		res.send();
 	});
-		
+
 	self.router.get('/_generate/:user/:repo', function(req, res) {
 		if(!self.ensureDebug())
 			return;
@@ -90,6 +90,5 @@ WorldGenAPI.prototype.setupRoutes = function() {
 			console.log(e, e.stack.split('\n'));
 			res.status(500).send('error generating level');
 		});
-	});	
+	});
 }
-

@@ -4,11 +4,13 @@ const GitHubApi = require('github'),
       Promise = require('promise'),
 	  Chance = require('chance'),
 	  util = require('util'),
-	  platformGenerators = require('./platformGenerators');
+	  platformGenerators = require('./platformGenerators'),
+      ExecFile = require('./execfile');
 
 const githubLevelData = {
 	getRepo: function(wg, opts, cb) { return wg.github.repos.get(opts, cb); },
 	getCommits: function(wg, opts, cb) { return wg.github.repos.getCommits(opts, cb); },
+    getContributors: function(wg, opts, cb) { return wg.github.repos.getStatsContributors(opts, cb); }
 };
 
 const testLevelData = {
@@ -23,7 +25,7 @@ const testLevelData = {
 			return cb(null, []);
 
 		const author = { email: "a@b" };
-		
+
 		return cb(null, [
 			{
 				sha: "B",
@@ -37,6 +39,35 @@ const testLevelData = {
 			},
 		]);
 	},
+
+    getContributors: function(wg, opts, cb) {
+        return cb(null, [
+            {
+                author: {
+                    login : "octocat",
+                },
+                total: 20
+            },
+            {
+                author: {
+                    login : "NuclearCookie",
+                },
+                total: 100
+            },
+            {
+                author: {
+                    login : "GlenDC",
+                },
+                total: 120
+            },
+            {
+                author: {
+                    login : "Ricky26",
+                },
+                total: 95
+            }
+        ]);
+    }
 };
 
 exports.githubLevelData = githubLevelData;
@@ -46,9 +77,9 @@ function WorldGenerator(opts) {
 	this.config = opts || {};
 	this.github = new GitHubApi({ version: '3.0.0' });
 	this.levelData = opts.levelData || githubLevelData;
-	
+
 	this.maxCommits = opts.maxCommits || 500;
-	
+
 };
 exports.WorldGenerator = WorldGenerator;
 
@@ -62,9 +93,11 @@ WorldGenerator.prototype.getLevelData = function(opts) {
 	var commits = {};
 	var numCommits = 0;
 	var leaves = [];
+    var contributors = [];
 	var target = null;
-	
+
 	return new Promise(function (a, r) {
+
 		levelData.getRepo(self, {
 			user: opts.user,
 			repo: opts.repo,
@@ -81,13 +114,15 @@ WorldGenerator.prototype.getLevelData = function(opts) {
 			const branch = repo.default_branch;
 
 			const finish = function() {
+                console.log( "Assigning contributors with length: " + contributors.length );
 				a({
 					commits: commits,
 					leaves: leaves,
 					target: target,
+                    contributors: contributors
 				});
 			};
-			
+
 			const next = function() {
 				if (numCommits >= maxCommits) {
 					finish();
@@ -122,7 +157,7 @@ WorldGenerator.prototype.getLevelData = function(opts) {
 									value.children.push(commit);
 								}
 							});
-							
+
 							const leafIdx = leaves.indexOf(commit.sha);
 							if(leafIdx >= 0) {
 								const args = [leafIdx, 1].concat(commit.parents.map(function(x) { return x.sha; }));
@@ -146,8 +181,24 @@ WorldGenerator.prototype.getLevelData = function(opts) {
 				});
 				page = page + 1;
 			};
-			
-			next();
+
+            levelData.getContributors(self, {
+                user: opts.user,
+                repo: opts.repo
+            }, function(err, cont) {
+                if ( err ) {
+                    r(err);
+                    return;
+                } else {
+                    contributors = cont;
+                    contributors.sort( function( a, b ) {
+                        return a.total > b.total;
+                    });
+                    contributors = contributors.slice(0, 10);
+
+	                next();
+                }
+            });
 		});
 	});
 }
@@ -164,6 +215,9 @@ WorldGenerator.prototype.generatePlatforms = function(levelData) {
 	levelData.spawn = levelData.goal;
 
 	levelData.commits[levelData.target].isMaster = true;
+
+    var context = ExecFile(__dirname + "/palette.js");
+    var colorPalette = context.palette('cb-RdYlBu', levelData.contributors.length);
 
 	// Mark mainline
 	var mainNode = levelData.commits[levelData.target];
@@ -200,13 +254,14 @@ WorldGenerator.prototype.generatePlatforms = function(levelData) {
 		}
 
 		if(commit.platformGen)
-			continue
+			continue;
+
 		commit.platformGen = true;
-		
+
 		const authorRandom = new Chance(commit.commit.author.email);
-		
+
 		commit.position = null;
-		commit.color = authorRandom.color({format: 'hex'});
+		commit.color = colorPalette[authorRandom.natural({min: 0, max: levelData.contributors.length - 1})];
 
 		commit.width = 3;
 		commit.height = 1;
@@ -247,15 +302,15 @@ WorldGenerator.prototype.generatePlatforms = function(levelData) {
 			finalPlatforms.push(a);
 			return;
 		}
-		
+
 		if(!a.prev.included)
 			return;
-		
+
 		var blocked = false;
 		sortedPlatforms.forEach(function(b) {
 			if(!b.isMaster || (b.sha == a.sha))
 				return;
-			
+
 			const pleft = (b.position[0] - b.width*0.5 - 1),
 				  pright = (b.position[0] + b.width*0.5 + 1),
 				  ptop = (b.position[1] - b.height*0.5 - 1),
@@ -264,7 +319,7 @@ WorldGenerator.prototype.generatePlatforms = function(levelData) {
 				  eright = (a.position[0] + a.width*0.5),
 				  etop = (a.position[1] - a.height*0.5),
 				  ebottom = (a.position[1] + a.height*0.5);
-			
+
 			if((pleft < eright) && (pright > eleft) &&
 			   (ptop < ebottom) && (pbottom > etop))
 				blocked = true;
@@ -294,7 +349,7 @@ WorldGenerator.prototype.generateLevel = function(opts) {
 	const self = this;
 	return self.getLevelData(opts).then(function (levelData) {
 		levelData.tiles = [];
-		
+
 		self.generatePlatforms(levelData);
 
 		var result = {
@@ -311,23 +366,23 @@ WorldGenerator.prototype.generateLevel = function(opts) {
 						Math.trunc(pos[0] + x - (commit.width * 0.5)),
 						Math.trunc(pos[1] + y - (commit.height * 0.5))];
 
-					// If we're on the spawn or goal:
+
+                    // If we're on the spawn or goal:
 					if (levelData.spawn.sha == commit.sha) {
 						const spos = [tpos[0], tpos[1]-1];
 						result.tiles.push({
 							type: "spawn",
-							position: spos,
-							color: 'green',
+							position: spos
 						});
 					} else if (levelData.goal.sha == commit.sha) {
 						const spos = [tpos[0], tpos[1]-1];
 						result.tiles.push({
 							type: "goal",
 							position: spos,
-							color: 'blue',
+                            color: "#3c53a1"
 						});
 					}
-					
+
 					result.tiles.push({
 						position: tpos,
 						color: commit.color,
