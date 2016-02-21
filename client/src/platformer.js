@@ -323,7 +323,6 @@ LevelState.prototype = {
 					var ele = $('<li class="levelBtn"/>').append(span).appendTo(target);
 				});
 
-				console.log(self.leftSidebar.element('voteArea'));
 				self.leftSidebar.element('voteArea').css({
 					visibility: 'visible',
 				});
@@ -699,11 +698,9 @@ Platformer.World.prototype = {
 		
 		if(player.lastPlatform != platform) {
 			player.lastPlatform = platform;
-			console.log(player, platform); 
 
 			var ui = Platformer.ui.factory("right");
 			var commit = ui.element("commitArea");
-			console.log(commit);
 			
 			commit.find('#authorImg').attr('src', platform.platformData.avatar);
 			commit.find('#author').text(platform.platformData.author);
