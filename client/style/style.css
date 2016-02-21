@@ -258,6 +258,15 @@ div.center {
 #authorImg {
 	width: 100px;
 	height: 100px;
+	float: right;
+}
+
+#author {
+	min-height: 80px;
+}
+
+.commitContent pre {
+	overflow: auto;
 }
 
 #ui #commitArea .commitContent {

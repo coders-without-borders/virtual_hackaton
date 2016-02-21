@@ -696,7 +696,7 @@ Platformer.World.prototype = {
 		if(player.lastPlatform != platform) {
 			player.lastPlatform = platform;
 
-			var ui = Platformer.ui.factory("right");
+			var ui = Platformer.ui.factory("left");
 			var commit = ui.element("commitArea");
 			
 			commit.find('#authorImg').attr('src', platform.platformData.avatar);
