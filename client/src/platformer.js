@@ -673,7 +673,7 @@ Platformer.World.prototype = {
         if(pos.x < Platformer.padding
                 || (this.bounds.max.x - pos.x) < Platformer.padding
                 || (this.bounds.max.y - pos.y) < Platformer.padding) {
-            this.onPlayerDie(this.player);
+            this.onPlayerDie(this.player.square);
         }
     },
 
