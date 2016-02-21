@@ -102,8 +102,6 @@ Platformer.preload = function() {
 
 Platformer.create = function() {
     window.Platformer = Platformer;
-    Platformer.game.stage.backgroundColor = "rgb(99, 99, 99)";
-
     Platformer.game.physics.startSystem(Phaser.Physics.ARCADE);
     Platformer.game.physics.arcade.gravity.y = Platformer.gravity;
     Platformer.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -119,25 +117,6 @@ Platformer.create = function() {
 
 Platformer.update = function() {
 
-};
-
-/**
- * Function to get fingerprint of user
- */
-Platformer.getFingerprint = function(callback) {
-    var fingerprint = $.cookie('hufp');
-
-    // if we already have one, simply return it
-    if(fingerprint) {
-        callback(fingerprint);
-        return;
-    }
-
-    // otherwise simply get it
-    new Fingerprint2().get(function(result) {
-        $.cookie('hufp', result, { expires: 1 });
-        callback(result);
-    });
 };
 
 /**
@@ -168,19 +147,16 @@ Platformer.loadLevelData = function(callback) {
  *   + Pull the actual message data from the server
  */
 Platformer.loadMessageData = function(callback) {
-    Platformer.getFingerprint(function(fingerprint) {
-        $.ajax({
-            'url' : '/onion_skin/get_last',
-            'type' : 'GET',
-            'data' : {
-                'count' : Platformer.maxOnionSkins,
-                'id': fingerprint,
-            },
-            'success' : function(response) {
-                Platformer.cache.messageData = response.results;
-                callback();
-            },
-        });
+    $.ajax({
+        'url' : '/onion_skin/get_last',
+        'type' : 'GET',
+        'data' : {
+            'count' : Platformer.maxOnionSkins,
+        },
+        'success' : function(response) {
+            Platformer.cache.messageData = response.results;
+            callback();
+        },
     });
 };
 
@@ -209,15 +185,10 @@ Platformer.submitOnionData = function(message) {
         // instead of pushing it, let's just submit it!
         Platformer.cache.messageData.push(onion);
 
-        Platformer.getFingerprint(function(fingerprint) {
-            $.ajax({
-                'url' : '/onion_skin/add',
-                'type' : 'POST',
-                'data' : {
-                    onion: onion,
-                    id: fingerprint,
-                },
-            });
+        $.ajax({
+            'url' : '/onion_skin/add',
+            'type' : 'POST',
+            'data' : onion,
         });
     }
 };
@@ -295,50 +266,9 @@ LevelState.prototype = {
         this.planet.create(
             Platformer.cache.levelData,
             Platformer.cache.messageData);
-
-		if(Platformer.ui) {
-			this.leftSidebar = Platformer.ui.factory("left");
-			this.rightSidebar = Platformer.ui.factory("right");
-
-			this.refresh();
-		}
-	},
-	refresh: function() {
-		var self = this;
-
-		$.getJSON("/votes/get_top_repos")
-			.then(function(repos) {
-				var target = self.leftSidebar.element("voteList");
-				target.html('');
-				
-				$.each(repos.rows, function() {
-					var data = { repo: this.repo, user: this.username, votes: this.votes };
-						
-					var repoSpan = $('<span/>').addClass('repoUserName').text(data.user + '/');
-					var icon = $('<span class="iconTick"/>');
-					var span = $('<span/>')
-						.append(repoSpan)
-						.append(document.createTextNode(data.repo + " - " + data.votes))
-						.append(icon);
-					var ele = $('<li class="levelBtn"/>').append(span).appendTo(target);
-				});
-
-				console.log(self.leftSidebar.element('voteArea'));
-				self.leftSidebar.element('voteArea').css({
-					visibility: 'visible',
-				});
-	
-				self.refreshTimeout = setTimeout(function() {
-					self.refreshTimeout = null;
-					self.refresh();
-				}, 5000);
-			});
 	},
     update: function() {
-        this.planet.update()
-
-		if(this.refreshTimeout)
-			clearTimeout(this.refreshTimeout);
+        this.planet.update();
     },
 };
 
@@ -499,7 +429,7 @@ Platformer.World.prototype = {
         var startPositions = [];
         levelData.tiles.forEach(function(tile) {
             if(tile.type == null) {
-                that.addPlatform(tile.position[0], tile.position[1], tile.color, tile);
+                that.addPlatform(tile.position[0], tile.position[1], tile.color);
             }
             else if(tile.type == "spinner") {
                 that.addSpinner(tile.position[0], tile.position[1]);
@@ -551,7 +481,7 @@ Platformer.World.prototype = {
         var offset = circularOffset(angle);
         angle = offset[1];
 
-        var circle = Platformer.createCircle(offset[0], "#b2182b", 0.85);
+        var circle = Platformer.createCircle(offset[0], "#FFFFFF", 0.85);
         circle.body.allowGravity = false;
 
         circle.update = function() {
@@ -584,7 +514,7 @@ Platformer.World.prototype = {
         var offset = linearOffset(angle);
         angle = offset[1];
 
-        var circle = Platformer.createCircle(offset[0], "#b2182b", 0.85);
+        var circle = Platformer.createCircle(offset[0], "#FFFFFF", 0.85);
         circle.body.allowGravity = false;
 
         circle.update = function() {
@@ -597,10 +527,9 @@ Platformer.World.prototype = {
         this.obstacles.add(circle);
     },
 
-    addPlatform: function(x, y, color, data) {
+    addPlatform: function(x, y, color) {
         var pos = Platformer.World.getPos(x, y);
         var square = Platformer.createSquare(pos, color);
-		square.platformData = data;
 
         var max = {
             x: pos.x + Platformer.unit,
@@ -656,8 +585,13 @@ Platformer.World.prototype = {
             var msgPos = bounds.computeCenter();
             var text = Platformer.game.add.text(
                 msgPos.x, msgPos.y - (Platformer.unit / 1.25),
-                onion.message,
+<<<<<<< aed640fe127cfeb9ea8d55bd117e20d85731b4fb
+                String.fromCodePoint(onion.message),
                 Platformer.getFontStyle(onion.color));
+=======
+                data.message,
+                Platformer.getFontStyle(data.onion.color));
+>>>>>>> Adding more vote flow
 
                 text.anchor.set(0.5);
         }
@@ -666,7 +600,7 @@ Platformer.World.prototype = {
     update: function() {
         this.player.collide(this.obstacles, this.onPlayerDie);
         this.player.collide(this.goals, this.onPlayerReachGoal);
-        this.player.collide(this.platforms, this.onPlayerTouchedPlatform);
+        this.player.collide(this.platforms);
         this.player.update();
 
         // Check if we're not outside the level (dead)
@@ -692,28 +626,6 @@ Platformer.World.prototype = {
 			Platformer.game.state.start("ResultState");
 		});
     },
-
-	onPlayerTouchedPlatform: function(player, platform) {
-		if(!Platformer.ui || !platform.platformData)
-			return;
-		
-		if(player.lastPlatform != platform) {
-			player.lastPlatform = platform;
-			console.log(player, platform); 
-
-			var ui = Platformer.ui.factory("right");
-			var commit = ui.element("commitArea");
-			console.log(commit);
-			
-			commit.find('#authorImg').attr('src', platform.platformData.avatar);
-			commit.find('#author').text(platform.platformData.author);
-			commit.find('#commitSha').text(platform.platformData.id);
-			commit.find('#commitMsg').text(platform.platformData.message);
-			commit.css({
-				visibility: 'visible',
-			}).show();
-		}
-	},
 };
 
 /**
@@ -723,7 +635,6 @@ Platformer.Player = function(pos) {
     this.color = "#FFFF00";
     this.square = Platformer.createSquare(
         pos, this.color, Platformer.playerScale);
-	this.square.player = this;
 
     this.recorder = new Platformer.MovementRecorder(pos);
 
@@ -772,15 +683,9 @@ Platformer.Player.prototype = {
     },
 
     collide: function(other, callback) {
-		var self = this;
-		var ourCB;
-		if(callback) {
-			ourCB = function(a, b) {
-				return callback.call(self, a, b);
-			}
-		}
-		
-		Platformer.game.physics.arcade.collide(this.square, other, ourCB, null, this);
+        if(Platformer.game.physics.arcade.collide(this.square, other) && callback) {
+            callback(this);
+        }
     }
 };
 

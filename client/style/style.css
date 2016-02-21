@@ -14,7 +14,7 @@ body, canvas {
 
 #ui {
 	font-family: 'Rubik', sans;
-	font-size: 14pt;
+	font-size: 10pt;
 }
 
 #ui pre {
@@ -73,14 +73,15 @@ body, canvas {
 	padding: 0.5em;
 	margin: 0;
 	color: white;
+	font-weight: 100;
 }
 
 #ui h1 {
-	font-size: 28pt;
+	font-size: 18pt;
 }
 
 #ui h2 {
-	font-size: 18pt;
+	font-size: 12pt;
 }
 
 #ui .loadingScreen {
@@ -117,7 +118,7 @@ body, canvas {
 }
 
 #ui_dead .radioButtons .levelBtn > span {
-	font-size: 14pt;
+	font-size: 10pt;
 	padding: 0.25em;
 }
 
@@ -173,7 +174,7 @@ div.center {
 	font-family: 'Chewy';
 	
 	display: inline-block;
-	font-size: 24pt;
+	font-size: 18pt;
 	padding: 0.5em;
 	border-radius: 1px;
 }
@@ -231,23 +232,8 @@ div.center {
 	background: #990000;
 }
 
-@-webkit-keyframes sk-rotateplane {
-	0% { -webkit-transform: perspective(120px) }
-	50% { -webkit-transform: perspective(120px) rotateY(180deg) }
-	100% { -webkit-transform: perspective(120px) rotateY(180deg)  rotateX(180deg) }
-}
-
-@keyframes sk-rotateplane {
-	0% { 
-		transform: perspective(120px) rotateX(0deg) rotateY(0deg);
-		-webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg) 
-	} 50% { 
-		transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
-		-webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg) 
-	} 100% { 
-		transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
-		-webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
-	}
+#ui #commitArea {
+	overflow: hidden;
 }
 
 /* Icon helpers */
@@ -267,4 +253,66 @@ div.center {
 .repoUserName {
 	padding: 0;
 	color: #999;
+}
+
+#authorImg {
+	width: 100px;
+	height: 100px;
+}
+
+#ui #commitArea .commitContent {
+	padding: 10px;
+}
+
+/* Responsive stuff */
+
+@media screen and (min-width: 1200px) {	
+	#ui .sidebarWidth {
+		width: 300px;
+	}
+
+	#ui {
+		font-size: 14pt !important;
+	}
+
+	#ui h1 {
+		font-size: 24pt;
+	}
+
+	#ui h2 {
+		font-size: 18pt;
+	}
+
+	#ui_dead .radioButtons .levelBtn > span {
+		font-size: 14pt;
+	}		   
+
+	#ui_dead .radioButtons label > span {
+		font-size: 32pt;
+	}
+
+	#ui .bigButton {
+		font-size: 24pt;
+	}
+}
+
+/* SpinnerKit */
+
+@-webkit-keyframes sk-rotateplane {
+	0% { -webkit-transform: perspective(120px) }
+	50% { -webkit-transform: perspective(120px) rotateY(180deg) }
+	100% { -webkit-transform: perspective(120px) rotateY(180deg)  rotateX(180deg) }
+}
+
+@keyframes sk-rotateplane {
+	0% { 
+		transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+		-webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg) 
+	} 50% { 
+		transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+		-webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg) 
+	} 100% { 
+		transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+		-webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+	}
 }

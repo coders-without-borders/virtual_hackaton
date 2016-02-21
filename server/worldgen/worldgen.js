@@ -387,8 +387,10 @@ WorldGenerator.prototype.generateLevel = function(opts) {
 						position: tpos,
 						color: commit.color,
 						id: commit.sha,
-						pid: commit.parent ? commit.parent.sha : null,
 						master: commit.isMaster,
+						avatar: commit.author.avatar_url,
+						author: commit.commit.author.name,
+						message: commit.commit.message,
 					});
 				}
 			}

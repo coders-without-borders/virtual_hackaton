@@ -31,10 +31,7 @@
 		<div id="voteArea" class="panelArea sidebarWidth uiHidden">
 		  <!-- Voting area -->
 		  <h2>Next Level</h2>
-		  <ol>
-			<li>Level1 - 2 <span class="icnTick"></span></li>
-			<li>Level2 - 1 <span class="icnTickWhite"></span></li>
-			<li>Level3 - 0 <span class="icnTickWhite"></span></li>
+		  <ol id="voteList">
 		  </ol>
 		</div>
 	  </div>
@@ -44,8 +41,14 @@
 		<div id="commitArea" class="panelArea sidebarWidth uiHidden">
 		  <!-- Commit info -->
 		  <h2>Commit</h2>
-		  <label>Hash</label>
-		  <p>12345</p>
+		  <div class="commitContent">
+			<img id="authorImg"/>
+			<a id="authorUrl"><p id="author"></p></a>
+			<a id="commitUrl">
+			  <pre id="commitSha"></pre>
+			  <pre id="commitMsg"></pre>
+			</a>
+		  </div>
 		</div>
 	  </div>
 
