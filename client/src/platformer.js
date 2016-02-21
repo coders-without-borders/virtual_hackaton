@@ -150,22 +150,7 @@ Platformer.loadMessageData = function(callback) {
         callback();
     }
     else {
-        Platformer.cache.messageData = [
-            {
-                onion: {
-                    path: [
-                        {x: 210, y: 160},
-                        {x: 220, y: 170},
-                        {x: 230, y: 180},
-                        {x: 240, y: 190},
-                        {x: 250, y: 200},
-                    ],
-                    color: "#FF0000",
-                },
-                message: 0x1F601,
-            },
-        ];
-
+        Platformer.cache.messageData = [];
         callback();
     }
 };
@@ -285,7 +270,7 @@ LevelState.prototype = {
 var DeadState = function(){};
 DeadState.prototype = {
   	preload: function() {
-		const self = this;
+		var self = this;
         this.continueButton = Platformer.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
 		if(Platformer.ui) {
@@ -297,6 +282,10 @@ DeadState.prototype = {
 		}
     },
 	finishScreen: function() {
+        var val = "&#128169;";
+        var codePoint = val.substr(2, val.length-3);
+        codePoint = parseInt(codePoint, 10);
+        Platformer.submitOnionData(codePoint);
         Platformer.game.state.start("LoadState");
 	},
     update: function() {
@@ -318,7 +307,7 @@ var ResultState = function(){};
 ResultState.prototype = {
     // [TODO] Implementation
   	preload: function() {
-		const self = this;
+		var self = this;
         this.continueButton = Platformer.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
 		if(Platformer.ui) {

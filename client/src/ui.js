@@ -21,13 +21,6 @@
 			return $(ele, "#" + name);
 		};
 
-		ele.element("submit").submit(function() {
-			var val = "&#128512;";
-			var codePoint = val.substr(2, val.length-3);
-			codePoint = parseInt(codePoint, 10);
-			window.Platformer.submitOnionData(codePoint);
-		});
-
 		ele.show = function() {
 			const win = $(window);
 			const left = Math.max(0, ((win.width() - ele.outerWidth()) / 2) + win.scrollLeft()) + "px";
