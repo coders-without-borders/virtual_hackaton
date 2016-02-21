@@ -379,7 +379,7 @@ WorldGenerator.prototype.generateLevel = function(opts) {
 						result.tiles.push({
 							type: "goal",
 							position: spos,
-                            color: "#3c53a1"
+                            color: "#3ca155"
 						});
 					}
 
