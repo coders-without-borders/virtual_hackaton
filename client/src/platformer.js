@@ -8,11 +8,11 @@ var Platformer = Platformer || {
     unit: 35.0,
     playerScale: 0.65,
     game: null,
-    gravity: 450,
+    gravity: 425,
     padding: 100,
     speed: {
-        walk: 120,
-        jump: 180,
+        walk: 115,
+        jump: 245,
     },
     cache: {},
 };
@@ -164,10 +164,15 @@ Platformer.World.prototype = {
         var pos = startPositions[Math.floor(Math.random() * startPositions.length)];
         this.player = new Platformer.Player(Platformer.World.getPos(pos[0], pos[1]), Platformer.game);
 
+        this.bounds.min.x -= Platformer.padding;
+        this.bounds.min.y -= Platformer.padding;
+        this.bounds.max.x += Platformer.padding;
+        this.bounds.max.y += Platformer.padding;
+
         Platformer.game.world.setBounds(
             this.bounds.min.x, this.bounds.min.y,
-            this.bounds.max.x + Platformer.padding * 2,
-            this.bounds.max.y + Platformer.padding * 2);
+            this.bounds.max.x - this.bounds.min.x,
+            this.bounds.max.y - this.bounds.min.y);
     },
 
     addSpinner: function(x, y) {
@@ -237,18 +242,24 @@ Platformer.World.prototype = {
     },
 
     addPlatform: function(x, y, color) {
-        var position = Platformer.World.getPos(x, y);
-        var square = Platformer.createSquare(position, color);
+        var pos = Platformer.World.getPos(x, y);
+        var square = Platformer.createSquare(pos, color);
 
         var max = {
-            x: position.x + Platformer.unit,
-            y: position.y + Platformer.unit,
+            x: pos.x + Platformer.unit,
+            y: pos.y + Platformer.unit,
         };
         if(max.x > this.bounds.max.x) {
             this.bounds.max.x = max.x;
         }
+        else if(pos.x < this.bounds.min.x) {
+            this.bounds.min.x = pos.x;
+        }
         if(max.y > this.bounds.max.y) {
             this.bounds.max.y = max.y;
+        }
+        else if(pos.y < this.bounds.min.y) {
+            this.bounds.min.y = pos.y;
         }
 
         square.body.allowGravity = false;
