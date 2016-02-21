@@ -238,12 +238,20 @@ Platformer.createCircle = function(pos, color, scale) {
 var LoadState = function(){};
 LoadState.prototype = {
   	create: function(){
+		if(Platformer.ui) {
+			this.ui = Platformer.ui.factory("loading").show();
+		};
+		
         Platformer.loadLevelData(function() {
             Platformer.loadMessageData(function() {
                 Platformer.game.state.start("LevelState");
             });
         });
 	},
+    shutdown: function() {
+		if(this.ui)
+			this.ui.hide();
+    },
 };
 
 /**
