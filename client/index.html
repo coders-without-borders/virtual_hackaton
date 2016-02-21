@@ -26,7 +26,7 @@
 		  <!-- Buttons -->
 		  <div class="toolbarIcon"><span>&#x1f50a;</span></div>
 		</div>
-		<div class="panelArea sidebarWidth">
+		<div id="voteArea" class="panelArea sidebarWidth uiHidden">
 		  <!-- Voting area -->
 		  <h2>Next Level</h2>
 		  <ol>
@@ -39,7 +39,7 @@
 	  
 	  <!-- right Sidebar -->
 	  <div id="ui_right" class="ui uiScreen uiSidebar uiVisible">
-		<div class="panelArea sidebarWidth">
+		<div id="commitArea" class="panelArea sidebarWidth uiHidden">
 		  <!-- Commit info -->
 		  <h2>Commit</h2>
 		  <label>Hash</label>
@@ -50,36 +50,36 @@
 	  <!-- On-death screen -->
 	  <div id="ui_dead" class="ui uiScreen">
 		<h1>You died!</h1>
-		<form action="#">
+		<form id="deadForm" action="#">
 		  <div id="messageFieldSet" class="fieldset radioButtons">
 			<div class="legend">Leave a message:</div>
 			<label class="emoteBtn"><input type="radio" name="message" value="&#128512;"><span>&#128512;</span></label>
-			<label class="emoteBtn"><input type="radio" name="message" value="&#128512;"><span>&#128512;</span></label>
-			<label class="emoteBtn"><input type="radio" name="message" value="&#128512;"><span>&#128512;</span></label>
-			<label class="emoteBtn"><input type="radio" name="message" value="&#128512;"><span>&#128512;</span></label>
-			<label class="emoteBtn"><input type="radio" name="message" value="&#128512;"><span>&#128512;</span></label>
+			<label class="emoteBtn"><input type="radio" name="message" value="&#x1f6ab;"><span>&#x1f6ab;</span></label>
+			<label class="emoteBtn"><input type="radio" name="message" value="&#x2764;"><span>&#x2764;</span></label>
+			<label class="emoteBtn"><input type="radio" name="message" value="&#x2753;"><span>&#x2753;</span></label>
+			<label class="emoteBtn"><input type="radio" name="message" value="&#x2714;"><span>&#x2714;</span></label>
+			<label class="emoteBtn"><input type="radio" name="message" value="&#x2716;"><span>&#x2716;</span></label>
+			<label class="emoteBtn"><input type="radio" name="message" value="&#x1f4a9;"><span>&#x1f4a9;</span></label>
 			<div></div>
 		  </div>
 		  
 		  <div id="voteFieldSet" class="fieldset radioButtons">
 			<div class="legend">Vote on next level:</div>
-			<label class="levelBtn"><input type="radio" name="nextLevel" value="Zweeb"><span>Zweeb</span></label>
-			<label class="levelBtn"><input type="radio" name="nextLevel" value="Zweeb"><span>Zweeb</span></label>
-			<label class="levelBtn"><input type="radio" name="nextLevel" value="Zweeb"><span>Zweeb</span></label>
-			<label class="levelBtn"><input type="radio" name="nextLevel" value="Zweeb"><span>Zweeb</span></label>
+			<div id="spinner" class="spinner"></div>
+			<div id="voteFields"></div>
 		  </div>
 
 		  <label class="labelAbove">Press space to continue!</label>
-		  <div class="center"><button type="submit" class="bigButton">Respawn!</button></div>
+		  <div class="center"><button id="submit" type="submit" class="bigButton">Respawn!</button></div>
 		</form>
 	  </div>
 	
 	  <!-- On-win screen -->
 	  <div id="ui_won" class="ui uiScreen">
 		<h1>You won!</h1>
-		<form action="#">
+		<form id="wonForm" action="#">
 		  <label class="labelAbove">Press space to continue!</label>
-		  <div class="center"><button type="submit" class="bigButton">Respawn!</button></div>
+		  <div class="center"><button id="submit" type="submit" class="bigButton">Respawn!</button></div>
 		</form>
 	  </div>
 	</div>

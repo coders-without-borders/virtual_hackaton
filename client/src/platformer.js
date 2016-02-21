@@ -141,7 +141,7 @@ Platformer.loadLevelData = function(callback) {
 /**
  * The main client function where we retrieve the current onion data from
  * the server. Each onion data package can also optionally
- * contain a message (integer) id.
+ * contain a message.
  *
  * [TODO]
  *   + Pull the actual message data from the server
@@ -283,18 +283,67 @@ DeadState.prototype = {
         this.continueButton = Platformer.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
 		if(Platformer.ui) {
-			this.ui = Platformer.ui.factory('dead').show();
-			this.ui.element("submit").submit(function() {
+			this.ui = Platformer.ui.factory('dead');
+
+			this.ui.element("spinner").show();
+			this.ui.element("voteFields").hide();
+			this.ui.show();
+
+			$.getJSON("/votes/get_top_repos")
+				.then(function(repos) {
+					var target = self.ui.element("voteFields");
+					target.html('');
+					
+					$.each(repos.rows, function() {
+						var data = { repo: this.repo, user: this.username };
+						
+						var repoSpan = $('<span/>').addClass('repoUserName').text(data.user + '/');
+						var span = $('<span/>').append(repoSpan).append(document.createTextNode(data.repo));
+						var input = $('<input type="radio" name="nextLevel"/>').val(JSON.stringify(data));
+						var label = $('<label class="levelBtn"/>').append(input).append(span).appendTo(target);
+					});
+
+					self.ui.element("spinner").hide();
+					self.ui.element("voteFields").show();
+				});
+			
+			this.ui.element("deadForm").submit(function() {
 				self.finishScreen();
 				return false;
 			});
 		}
     },
 	finishScreen: function() {
-        var val = "&#128169;";
-        var codePoint = val.substr(2, val.length-3);
-        codePoint = parseInt(codePoint, 10);
-        Platformer.submitOnionData(codePoint);
+		var message = String.fromCodePoint(128169);
+		if(this.ui) {
+			var newMessage = this.ui.activeRadio("message").val();
+			if(newMessage)
+				message = newMessage;
+
+			var customRepo = this.ui.element("customLevel").val();
+			var vote = this.ui.activeRadio("nextLevel").val()
+
+			
+			
+			if(customRepo) {
+				var parts = customRepo.split('/');
+				if(parts.length == 2) {
+					vote = { user: parts[0], repo: parts[1] };
+				}
+			}
+
+			if(vote) {
+				vote = JSON.parse(vote);
+
+				console.log("voting", vote);
+				$.post("/votes/vote_for_repo/" + encodeURIComponent(vote.user) + "/" + encodeURIComponent(vote.repo))
+					.then(function(result) {
+						console.log("voted: ", result);
+					});
+			}
+		}
+		
+        Platformer.submitOnionData(message);
         Platformer.game.state.start("LoadState");
 	},
     update: function() {
@@ -321,7 +370,7 @@ ResultState.prototype = {
 
 		if(Platformer.ui) {
 			this.ui = Platformer.ui.factory('won').show();
-			this.ui.element("submit").submit(function() {
+			this.ui.element("wonForm").submit(function() {
 				self.finishScreen();
 				return false;
 			});
@@ -536,7 +585,7 @@ Platformer.World.prototype = {
             var msgPos = bounds.computeCenter();
             var text = Platformer.game.add.text(
                 msgPos.x, msgPos.y - (Platformer.unit / 1.25),
-                String.fromCodePoint(onion.message),
+                onion.message,
                 Platformer.getFontStyle(onion.color));
 
                 text.anchor.set(0.5);
@@ -568,7 +617,9 @@ Platformer.World.prototype = {
 
     onPlayerReachGoal: function() {
         console.log("WIN!");
-        Platformer.game.state.start("ResultState");
+		$.post("/nextLevel").then(function() {
+			Platformer.game.state.start("ResultState");
+		});
     },
 };
 

@@ -29,6 +29,10 @@ body, canvas {
 	visibility: visible;
 }
 
+#ui .uiHidden {
+	visibility: hidden;
+}
+
 #ui .ui.uiSidebar {
 	background: transparent;
 }
@@ -108,9 +112,11 @@ body, canvas {
 	margin: 0;
 	width: 100%;
 	margin: 0.2em 0 0 0;
+	/* box-sizing: border-box; */
+	/* display: block; */
 }
 
-#ui_dead .radioButtons .levelBtn span {
+#ui_dead .radioButtons .levelBtn > span {
 	font-size: 14pt;
 	padding: 0.25em;
 }
@@ -131,12 +137,13 @@ div.center {
 	border-radius: 8px;
 	min-width: 0;
 	overflow: auto;
+	box-sizing: border-box;
 }
 
 #ui_dead .fieldset .legend {
 }
 
-#ui_dead .radioButtons label span {
+#ui_dead .radioButtons label > span {
 	text-align: center;
 	font-size: 32pt;
 	padding: 13px 0px;
@@ -182,10 +189,14 @@ div.center {
 }
 
 #ui .loadingScreen .spinner {
+	background-color: #fff;
+}
+
+.spinner {
+	background-color: #ccc;
+	
 	width: 40px;
 	height: 40px;
-	background-color: #fff;
-
 	margin: 50px auto;
 	-webkit-animation: sk-rotateplane 1.2s infinite ease-in-out;
 	animation: sk-rotateplane 1.2s infinite ease-in-out;
@@ -251,4 +262,9 @@ div.center {
 	font-size: 18pt;
 	color: green;
 	content: '\2705';
+}
+
+.repoUserName {
+	padding: 0;
+	color: #999;
 }

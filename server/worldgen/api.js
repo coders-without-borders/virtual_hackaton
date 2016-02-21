@@ -29,21 +29,23 @@ WorldGenAPI.prototype.ensureDebug = function(req, resp) {
 };
 
 WorldGenAPI.prototype.getLevelData = function() {
+	const self = this;
+	
 	if(this.levelGenPromise)
 		return this.levelGenPromise;
 	
 	if(this.currentLevel)
-		return Promise.resolved(this.currentLevel);
+		return Promise.resolve(this.currentLevel);
 
 	this.levelGenPromise = this.generator.generateLevel({
 		user: this._nextLevel.user,
 		repo: this._nextLevel.repo,
 	}).then(function(levelData) {
-		this.currentLevel = levelData;
-		this.levelGenPromise = null;
+		self.currentLevel = levelData;
+		self.levelGenPromise = null;
 		return levelData;
 	}).catch(function(e) {
-		this.levelGenPromise = null;
+		self.levelGenPromise = null;
 		console.log(e);
 		throw e;
 	});

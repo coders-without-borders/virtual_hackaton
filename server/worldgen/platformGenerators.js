@@ -53,23 +53,20 @@ function miniCluster(levelData, platforms) {
 function loneSpinner(levelData, platforms) {
 	var platform = platforms.splice(0,1)[0];
 
-	var angle = levelData.random.floating({min: 0, max: Math.PI*2});
-	var dist = 15;
+	var angle = levelData.random.floating({min: -Math.PI*0.25, max: Math.PI*0.25});
+	var dist = 6;
 	
 	var pointA = platform.prev ? platform.prev.position : [0, 0];
-	var pointC = [
+	var pointB = [
 		Math.trunc(pointA[0] + Math.cos(angle)*dist),
 		Math.trunc(pointA[1] + Math.sin(angle)*dist)];
-	var pointB = [
-		Math.trunc((pointA[0] + pointC[0])*0.5),
-		Math.trunc((pointA[1] + pointC[1])*0.5)];
 
 	levelData.tiles.push({
 		type: 'spinner',
 		position: pointB,
 	});
 
-	platform.position = pointC;
+	platform.position = pointB;
 };
 
 function moverPlatform(levelData, platforms) {

@@ -18,7 +18,11 @@
 			return null;
 
 		ele.element = function(name) {
-			return $(ele, "#" + name);
+			return ele.find("#" + name);
+		};
+
+		ele.activeRadio = function(name) {
+			return ele.find("input[name=\""+name+"\"]:checked");
 		};
 
 		ele.show = function() {
