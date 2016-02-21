@@ -74,11 +74,6 @@
             console.log("Inserting:");
             console.log(onionData);
 
-            for (var i = 0; i < onionData.path.length; i++) {
-                onionData.path[i].x = parseInt(onionData.path[i].x);
-                onionData.path[i].y = parseInt(onionData.path[i].y);
-            }
-
             database.collection('onion_skin').insertOne( onionData, function( err, result ) {
                 if ( err ) {
                     console.log(err);
