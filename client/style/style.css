@@ -29,6 +29,34 @@ body, canvas {
 	visibility: visible;
 }
 
+#ui .ui.uiSidebar {
+	background: transparent;
+}
+
+#ui .ui#ui_left {
+	float: left;
+	position: fixed;
+	left: 0;
+}
+
+#ui .ui#ui_right {
+	float: right;
+	position: fixed;
+	right: 0;
+}
+
+#ui .panelArea {
+	margin: 10px;
+	background: white;
+	overflow: auto;
+}
+
+#ui .uiSidebar ol {
+	padding: 0 0 0 1.5em;
+	margin: 1em;
+	overflow: auto;
+}
+
 #ui h1,
 #ui h2,
 #ui h3,
@@ -163,6 +191,35 @@ div.center {
 	animation: sk-rotateplane 1.2s infinite ease-in-out;
 }
 
+#ui .panelArea.toolbar {
+	background: transparent;
+}
+
+#ui .sidebarWidth {
+	width: 250px;
+}
+
+#ui .toolbarIcon {
+	display: block;
+	width: 80px;
+	height: 80px;
+	background: #007700;
+	color: #fff;
+	font-size: 50px;
+
+	text-align: center;
+	cursor: pointer;
+}
+
+#ui .toolbarIcon span {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+#ui .toolbarIcon.disabled {
+	background: #990000;
+}
+
 @-webkit-keyframes sk-rotateplane {
 	0% { -webkit-transform: perspective(120px) }
 	50% { -webkit-transform: perspective(120px) rotateY(180deg) }
@@ -180,4 +237,18 @@ div.center {
 		transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
 		-webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
 	}
+}
+
+/* Icon helpers */
+
+.icnTick:after {
+	font-size: 24pt;
+	color: green;
+	content: '\2714';
+}
+
+.icnTickWhite:after {
+	font-size: 18pt;
+	color: green;
+	content: '\2705';
 }
