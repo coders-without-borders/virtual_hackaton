@@ -120,6 +120,25 @@ Platformer.update = function() {
 };
 
 /**
+ * Function to get fingerprint of user
+ */
+Platformer.getFingerprint = function(callback) {
+    var fingerprint = $.cookie('hufp');
+
+    // if we already have one, simply return it
+    if(fingerprint) {
+        callback(fingerprint);
+        return;
+    }
+
+    // otherwise simply get it
+    new Fingerprint2().get(function(result) {
+        $.cookie('hufp', result, { expires: 1 });
+        callback(result);
+    });
+};
+
+/**
  * The main client function where we retrieve the current level data
  * from the server.
  *
@@ -147,16 +166,19 @@ Platformer.loadLevelData = function(callback) {
  *   + Pull the actual message data from the server
  */
 Platformer.loadMessageData = function(callback) {
-    $.ajax({
-        'url' : '/onion_skin/get_last',
-        'type' : 'GET',
-        'data' : {
-            'count' : Platformer.maxOnionSkins,
-        },
-        'success' : function(response) {
-            Platformer.cache.messageData = response.results;
-            callback();
-        },
+    Platformer.getFingerprint(function(fingerprint) {
+        $.ajax({
+            'url' : '/onion_skin/get_last',
+            'type' : 'GET',
+            'data' : {
+                'count' : Platformer.maxOnionSkins,
+                'id': fingerprint,
+            },
+            'success' : function(response) {
+                Platformer.cache.messageData = response.results;
+                callback();
+            },
+        });
     });
 };
 
@@ -185,10 +207,15 @@ Platformer.submitOnionData = function(message) {
         // instead of pushing it, let's just submit it!
         Platformer.cache.messageData.push(onion);
 
-        $.ajax({
-            'url' : '/onion_skin/add',
-            'type' : 'POST',
-            'data' : onion,
+        Platformer.getFingerprint(function(fingerprint) {
+            $.ajax({
+                'url' : '/onion_skin/add',
+                'type' : 'POST',
+                'data' : {
+                    onion: onion,
+                    id: fingerprint,
+                },
+            });
         });
     }
 };

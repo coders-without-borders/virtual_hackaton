@@ -12,6 +12,8 @@
     "promise": "^7.1.1",
     "soundcloud": "~3.1.0",
     "sqlite3": "~3.1.1",
-    "yargs": "^4.1.0"
+    "yargs": "^4.1.0",
+    "jquery.cookie": "~1.4.1",
+    "fingerprintjs2": "~1.1.0"
   }
 }

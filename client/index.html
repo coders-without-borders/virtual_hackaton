@@ -5,11 +5,13 @@
     <title>Game, game?</title>
     <script src="../node_modules/phaser/build/phaser.min.js"></script>
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/fingerprintjs2/dist/fingerprint2.min.js"></script>
+    <script src="../node_modules/jquery.cookie/jquery.cookie.js"></script>
     <script src="src/ui.js"></script>
     <script src="src/platformer.js"></script>
 
 	<link href="https://fonts.googleapis.com/css?family=Chewy|Rubik|Inconsolata" rel="stylesheet" type="text/css">
-	
+
 	<link rel="stylesheet" type="text/css" href="style/style.css"/>
   </head>
   <body>
@@ -36,7 +38,7 @@
 		  </ol>
 		</div>
 	  </div>
-	  
+
 	  <!-- right Sidebar -->
 	  <div id="ui_right" class="ui uiScreen uiSidebar uiVisible">
 		<div id="commitArea" class="panelArea sidebarWidth uiHidden">
@@ -62,7 +64,7 @@
 			<label class="emoteBtn"><input type="radio" name="message" value="&#x1f4a9;"><span>&#x1f4a9;</span></label>
 			<div></div>
 		  </div>
-		  
+
 		  <div id="voteFieldSet" class="fieldset radioButtons">
 			<div class="legend">Vote on next level:</div>
 			<div id="spinner" class="spinner"></div>
@@ -73,7 +75,7 @@
 		  <div class="center"><button id="submit" type="submit" class="bigButton">Respawn!</button></div>
 		</form>
 	  </div>
-	
+
 	  <!-- On-win screen -->
 	  <div id="ui_won" class="ui uiScreen">
 		<h1>You won!</h1>

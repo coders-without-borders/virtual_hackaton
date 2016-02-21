@@ -19,7 +19,10 @@
     function addOnionSkin( req, res )
     {
         var data = req.body;
-        /* data should be in the form of:
+        var onionData = data.onion;
+        var id = data.id;
+        console.log(id);
+        /* onion data should be in the form of:
         {
             color: "#aabbcc",
             path: [ {x: 10, y: 20 }, {x: 12, y: 20 } ],
@@ -27,14 +30,14 @@
         }
         */
         console.log("Inserting:");
-        console.log(data);
+        console.log(onionData);
 
-        for (var i = 0; i < data.path.length; i++) {
-            data.path[i].x = parseInt(data.path[i].x);
-            data.path[i].y = parseInt(data.path[i].y);
+        for (var i = 0; i < onionData.path.length; i++) {
+            onionData.path[i].x = parseInt(onionData.path[i].x);
+            onionData.path[i].y = parseInt(onionData.path[i].y);
         }
 
-        database.collection('onion_skin').insertOne( data, function( err, result ) {
+        database.collection('onion_skin').insertOne( onionData, function( err, result ) {
             if ( err ) {
                 console.log(err);
             } else {
@@ -68,6 +71,8 @@
     function getLastOnionSkins( req, res ) {
         var results = [];
         var count = parseInt(req.query.count);
+        var id = req.query.id;
+        console.log(id);
 
         var collection = database.collection('onion_skin');
         var total = collection.find().count();
