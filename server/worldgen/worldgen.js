@@ -11,6 +11,10 @@ const githubLevelData = {
 	getCommits: function(wg, opts, cb) { return wg.github.repos.getCommits(opts, cb); },
 };
 
+var cachedUser = "";
+var cachedRepo = "";
+var cachedLevelData;
+
 const testLevelData = {
 	getRepo: function(wg, opts, cb) {
 		cb(null, {
@@ -23,7 +27,7 @@ const testLevelData = {
 			return cb(null, []);
 
 		const author = { email: "a@b" };
-		
+
 		return cb(null, [
 			{
 				sha: "B",
@@ -46,9 +50,9 @@ function WorldGenerator(opts) {
 	this.config = opts || {};
 	this.github = new GitHubApi({ version: '3.0.0' });
 	this.levelData = opts.levelData || githubLevelData;
-	
+
 	this.maxCommits = opts.maxCommits || 500;
-	
+
 };
 exports.WorldGenerator = WorldGenerator;
 
@@ -63,7 +67,7 @@ WorldGenerator.prototype.getLevelData = function(opts) {
 	var numCommits = 0;
 	var leaves = [];
 	var target = null;
-	
+
 	return new Promise(function (a, r) {
 		levelData.getRepo(self, {
 			user: opts.user,
@@ -87,7 +91,7 @@ WorldGenerator.prototype.getLevelData = function(opts) {
 					target: target,
 				});
 			};
-			
+
 			const next = function() {
 				if (numCommits >= maxCommits) {
 					finish();
@@ -122,7 +126,7 @@ WorldGenerator.prototype.getLevelData = function(opts) {
 									value.children.push(commit);
 								}
 							});
-							
+
 							const leafIdx = leaves.indexOf(commit.sha);
 							if(leafIdx >= 0) {
 								const args = [leafIdx, 1].concat(commit.parents.map(function(x) { return x.sha; }));
@@ -146,7 +150,7 @@ WorldGenerator.prototype.getLevelData = function(opts) {
 				});
 				page = page + 1;
 			};
-			
+
 			next();
 		});
 	});
@@ -202,9 +206,9 @@ WorldGenerator.prototype.generatePlatforms = function(levelData) {
 		if(commit.platformGen)
 			continue
 		commit.platformGen = true;
-		
+
 		const authorRandom = new Chance(commit.commit.author.email);
-		
+
 		commit.position = null;
 		commit.color = authorRandom.color({format: 'hex'});
 
@@ -247,15 +251,15 @@ WorldGenerator.prototype.generatePlatforms = function(levelData) {
 			finalPlatforms.push(a);
 			return;
 		}
-		
+
 		if(!a.prev.included)
 			return;
-		
+
 		var blocked = false;
 		sortedPlatforms.forEach(function(b) {
 			if(!b.isMaster || (b.sha == a.sha))
 				return;
-			
+
 			const pleft = (b.position[0] - b.width*0.5 - 1),
 				  pright = (b.position[0] + b.width*0.5 + 1),
 				  ptop = (b.position[1] - b.height*0.5 - 1),
@@ -264,7 +268,7 @@ WorldGenerator.prototype.generatePlatforms = function(levelData) {
 				  eright = (a.position[0] + a.width*0.5),
 				  etop = (a.position[1] - a.height*0.5),
 				  ebottom = (a.position[1] + a.height*0.5);
-			
+
 			if((pleft < eright) && (pright > eleft) &&
 			   (ptop < ebottom) && (pbottom > etop))
 				blocked = true;
@@ -292,9 +296,16 @@ WorldGenerator.prototype.generatePlatforms = function(levelData) {
 
 WorldGenerator.prototype.generateLevel = function(opts) {
 	const self = this;
+    if ( opts.user === cachedUser && opts.repo === cachedRepo ) {
+        var result = {
+			tiles: cachedLevelData.tiles,
+		};
+
+        return Promise.resolve(result);
+    }
 	return self.getLevelData(opts).then(function (levelData) {
 		levelData.tiles = [];
-		
+
 		self.generatePlatforms(levelData);
 
 		var result = {
@@ -327,7 +338,7 @@ WorldGenerator.prototype.generateLevel = function(opts) {
 							color: 'blue',
 						});
 					}
-					
+
 					result.tiles.push({
 						position: tpos,
 						color: commit.color,
@@ -338,6 +349,8 @@ WorldGenerator.prototype.generateLevel = function(opts) {
 				}
 			}
 		});
+
+        cachedLevelData = levelData;
 
 		return result;
 	}).catch(function(e) {
