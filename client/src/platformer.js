@@ -334,6 +334,7 @@ ResultState.prototype = {
 	},
     update: function() {
         if(this.continueButton.isDown) {
+			this.finishScreen();
         }
     },
     shutdown: function() {
