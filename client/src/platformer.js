@@ -336,6 +336,13 @@ LevelState.prototype = {
 		if(this.refreshTimeout)
 			clearTimeout(this.refreshTimeout);
     },
+	shutdown: function() {
+		if(Platformer.ui) {
+			var sidebar = Platformer.ui.factory("left");
+			sidebar.element("commitArea").css({ visibility: 'hidden' });
+			sidebar.element("voteArea").css({ visibility: 'hidden' });
+		}
+	},
 };
 
 /**
