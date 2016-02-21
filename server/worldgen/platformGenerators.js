@@ -1,3 +1,7 @@
+Math.trunc = Math.trunc || function(x) {
+  return x < 0 ? Math.ceil(x) : Math.floor(x);
+};
+
 function easyStraightLine(levelData, platforms) {
 	var count = Math.min(platforms.length, levelData.random.integer({min: 3, max: 5}));
 	var angle = levelData.random.floating({min: -Math.PI*0.4, max: Math.PI*0.2});
