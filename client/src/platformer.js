@@ -63,9 +63,9 @@ Platformer.Color.fromHex = function(hex) {
  */
 Platformer.Bounds = function(min, max) {
     this.min = min ||
-        { x: Number.MAX_VALUE, y: Number.MAX_VALUE };
+        { x: 99999999, y: 99999999 };
     this.max = max ||
-        { x: -Number.MAX_VALUE, y: -Number.MAX_VALUE };
+        { x: -99999999, y: -99999999 };
 };
 
 Platformer.Bounds.prototype = {
@@ -73,14 +73,14 @@ Platformer.Bounds.prototype = {
         if(pos.x < this.min.x) {
             this.min.x = pos.x;
         }
-        else if(pos.x > this.max.x) {
+        if(pos.x > this.max.x) {
             this.max.x = pos.x;
         }
 
         if(pos.y < this.min.y) {
             this.min.y = pos.y;
         }
-        else if(pos.y > this.max.y) {
+        if(pos.y > this.max.y) {
             this.max.y = pos.y;
         }
     },
@@ -162,7 +162,7 @@ Platformer.loadMessageData = function(callback) {
                     ],
                     color: "#FF0000",
                 },
-                message: String.fromCodePoint(0x1F601),
+                message: 0x1F601,
             },
         ];
 
@@ -188,10 +188,10 @@ Platformer.getFontStyle = function(color) {
  *
  * [TODO] Push the data also to the server
  */
-Platformer.submitOnionData = function(msg) {
+Platformer.submitOnionData = function(message) {
     var onion = Platformer.cache.onionData;
     if(onion) {
-        onion.msg = msg;
+        onion.message = message;
         // instead of pushing it, let's just submit it!
         Platformer.cache.messageData.push(onion);
     }
@@ -249,7 +249,7 @@ LoadState.prototype = {
 		if(Platformer.ui) {
 			this.ui = Platformer.ui.factory("loading").show();
 		};
-		
+
         Platformer.loadLevelData(function() {
             Platformer.loadMessageData(function() {
                 Platformer.game.state.start("LevelState");
@@ -538,7 +538,7 @@ Platformer.World.prototype = {
             var msgPos = bounds.computeCenter();
             var text = Platformer.game.add.text(
                 msgPos.x, msgPos.y - (Platformer.unit / 1.25),
-                data.message,
+                String.fromCodePoint(data.message),
                 Platformer.getFontStyle(data.onion.color));
 
                 text.anchor.set(0.5);
