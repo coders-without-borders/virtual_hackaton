@@ -1,8 +1,7 @@
 'use strict'
 
 /**
- * Main object for all the Platformer stuff, containing
- * prototypes, global values and helper functions
+ * Main "namespace" for the Platformer Stuff
  */
 var Platformer = Platformer || {
     unit: 50.0,
@@ -17,6 +16,9 @@ var Platformer = Platformer || {
     cache: {},
 };
 
+/**
+ * A simple color class
+ */
 Platformer.Color = function(r, g, b, a) {
     this.r = r;
     this.g = g;
@@ -24,6 +26,9 @@ Platformer.Color = function(r, g, b, a) {
     this.a = a || 255;
 };
 
+/**
+ * A static function to go from a hex string to a color object
+ */
 Platformer.Color.fromHex = function(hex) {
     var bigint = parseInt(hex.substr(1), 16);
     var values = [
@@ -44,7 +49,7 @@ Platformer.Color.fromHex = function(hex) {
 };
 
 /**
- * Initialize the platformer stuff
+ * Platformer GLobal Game Functions (preload, create, update)
  */
 Platformer.preload = function() {
 };
@@ -66,6 +71,12 @@ Platformer.update = function() {
 
 };
 
+/**
+ * The main client function where we retrieve the current level data
+ * from the server.
+ *
+ * We maintain a cached version to prevent loading everytime we die.
+ */
 Platformer.loadLevelData = function(callback) {
     if(Platformer.cache.levelData) {
         callback();
@@ -79,10 +90,15 @@ Platformer.loadLevelData = function(callback) {
     }
 };
 
+/**
+ * The main client function where we retrieve the current onion data from
+ * the server. Each onion data package can also optionally
+ * contain a message (integer) id.
+ *
+ * [TODO]
+ *   + Pull the actual message data from the server
+ */
 Platformer.loadMessageData = function(callback) {
-    // We always want to get all messages,
-    // but for now we need to just use cache server
-    // TODO finish this with real server data
     if(Platformer.cache.messageData) {
         callback();
     }
@@ -101,6 +117,10 @@ Platformer.loadMessageData = function(callback) {
     }
 };
 
+/**
+ * A simple helper function to retrieve a message string
+ * based on a message id
+ */
 Platformer.getMessage = function(id) {
     if(id == 1) {
         return "Hello, Message!";
@@ -109,6 +129,10 @@ Platformer.getMessage = function(id) {
     return "Err...";
 };
 
+/**
+ * Create the font style based on mostly common style parameters.
+ * Note: this function should only be used for onion messages!
+ */
 Platformer.getFontStyle = function(color) {
     return {
         font: (Platformer.unit * 0.25) + "px Arial",
@@ -117,13 +141,17 @@ Platformer.getFontStyle = function(color) {
     };
 }
 
+/**
+ * Add the current player to the rest of the onion data.
+ * This should probably only be called when the player dies.
+ *
+ * [TODO] Push the data also to the server
+ */
 Platformer.pushOnionData = function(pos, color, msg) {
     var onion = {
         onion: {pos: pos, color: color},
         msg: msg
     };
-
-    // TODO: Push Data TO Server
 
     Platformer.cache.messageData.push(onion);
 };
@@ -160,7 +188,10 @@ Platformer.createCircle = function(pos, color, scale) {
 }
 
 /**
- * Different states
+ * The load state is called when loading the level.
+ *
+ * [TODO]
+ *   + Add "Loading..." text or something similar
  */
 
 var LoadState = function(){};
@@ -174,6 +205,9 @@ LoadState.prototype = {
 	},
 };
 
+/**
+ * The levelState contains and manages the actual game logic.
+ */
 var LevelState = function(){};
 LevelState.prototype = {
   	create: function() {
@@ -188,7 +222,8 @@ LevelState.prototype = {
 };
 
 /**
- * The World object
+ * The World object manages everything in the game.
+ * This contains also the player.
  */
 Platformer.World = function() {
     this.bounds = {
@@ -201,13 +236,16 @@ Platformer.World = function() {
     this.goals = Platformer.game.add.group();
 };
 
+/**
+ * Helper functions to go from Json position to WorldPosition,
+ * and the other way around.
+ */
 Platformer.World.getPos = function(x, y) {
     return {
         x: x * Platformer.unit + Platformer.padding,
         y: y * Platformer.unit + Platformer.padding,
     };
 };
-
 Platformer.World.getJsonPos = function(pos) {
     return {
         x: (pos.x - Platformer.padding) / Platformer.unit,
