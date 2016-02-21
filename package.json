@@ -6,11 +6,12 @@
     "chance": "^1.0.0",
     "express": "~4.13.4",
     "github": "^0.2.4",
-    "phaser": "~2.4.6",
-    "promise": "^7.1.1",
-    "sqlite3": "~3.1.1",
     "jquery": "~2.2.0",
     "mongodb": "~2.1.7",
-    "soundcloud": "~3.1.0"
+    "phaser": "~2.4.6",
+    "promise": "^7.1.1",
+    "soundcloud": "~3.1.0",
+    "sqlite3": "~3.1.1",
+    "yargs": "^4.1.0"
   }
 }
