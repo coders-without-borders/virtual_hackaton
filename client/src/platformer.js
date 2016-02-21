@@ -646,6 +646,7 @@ Platformer.World.prototype = {
         for(var i = 0; i < c; ++i) {
             var alpha = ((step + (step * i)) * 125).toString(16).substr(0,2);
             var pos = onion.path[i];
+			pos = { x: parseFloat(pos.x), y: parseFloat(pos.y) };
             bounds.addPos(pos);
             var square = Platformer.createSquare(
                 pos, onion.color + alpha,
@@ -657,6 +658,7 @@ Platformer.World.prototype = {
 
         if(onion.message) {
             var msgPos = bounds.computeCenter();
+			console.log(msgPos, onion, Platformer.getFontStyle(onion.color));
             var text = Platformer.game.add.text(
                 msgPos.x, msgPos.y - (Platformer.unit / 1.25),
                 onion.message,
@@ -687,7 +689,7 @@ Platformer.World.prototype = {
     onPlayerDie: function(player) {
         Platformer.cachePlayerOnion(
             player.player.getPath(),
-            player.player.color);
+            '#' + player.player.color);
 
         Platformer.game.state.start("DeadState");
     },
