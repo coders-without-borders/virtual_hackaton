@@ -17,19 +17,30 @@ var Platformer = Platformer || {
     cache: {},
 };
 
-Platformer.Color = function(r, g, b) {
+Platformer.Color = function(r, g, b, a) {
     this.r = r;
     this.g = g;
     this.b = b;
-    this.a = 255;
+    this.a = a || 255;
 };
 
 Platformer.Color.fromHex = function(hex) {
     var bigint = parseInt(hex.substr(1), 16);
-    return new Platformer.Color(
+    var values = [
+        (bigint >> 24) & 255,
         (bigint >> 16) & 255,
         (bigint >> 8) & 255,
-        bigint & 255);
+        bigint & 255,
+    ];
+
+    if(hex.length > 7) {
+        return new Platformer.Color(
+            values[0], values[1], values[2], values[3]);
+    }
+
+    return new Platformer.Color(
+        values[1], values[2], values[3]);
+
 };
 
 /**
@@ -55,14 +66,66 @@ Platformer.update = function() {
 
 };
 
-Platformer.getLevelData = function(callback) {
+Platformer.loadLevelData = function(callback) {
     if(Platformer.cache.levelData) {
-        callback(Platformer.cache.levelData);
+        callback();
     }
     else {
         var levelURL = "http://localhost:3000/world/rust-lang/rust";
-        $.getJSON(levelURL).then(callback);
+        $.getJSON(levelURL).then(function(levelData) {
+            Platformer.cache.levelData = levelData;
+            callback();
+        });
     }
+};
+
+Platformer.loadMessageData = function(callback) {
+    // We always want to get all messages,
+    // but for now we need to just use cache server
+    // TODO finish this with real server data
+    if(Platformer.cache.messageData) {
+        callback();
+    }
+    else {
+        Platformer.cache.messageData = [
+            {
+                onion: {pos: {x: 5, y: 4}, color: "#FF0000"},
+                message: 1,
+            },
+            {
+                onion: {pos: {x: 0, y: 0}, color: "#0FFF00"},
+            },
+        ];
+
+        callback();
+    }
+};
+
+Platformer.getMessage = function(id) {
+    if(id == 1) {
+        return "Hello, Message!";
+    }
+
+    return "Err...";
+};
+
+Platformer.getFontStyle = function(color) {
+    return {
+        font: (Platformer.unit * 0.25) + "px Arial",
+        fill: color,
+        align: "center",
+    };
+}
+
+Platformer.pushOnionData = function(pos, color, msg) {
+    var onion = {
+        onion: {pos: pos, color: color},
+        msg: msg
+    };
+
+    // TODO: Push Data TO Server
+
+    Platformer.cache.messageData.push(onion);
 };
 
 /**
@@ -103,9 +166,10 @@ Platformer.createCircle = function(pos, color, scale) {
 var LoadState = function(){};
 LoadState.prototype = {
   	create: function(){
-        Platformer.getLevelData(function(levelData) {
-            Platformer.cache.levelData = levelData;
-            Platformer.game.state.start("LevelState");
+        Platformer.loadLevelData(function() {
+            Platformer.loadMessageData(function() {
+                Platformer.game.state.start("LevelState");
+            });
         });
 	},
 };
@@ -114,7 +178,9 @@ var LevelState = function(){};
 LevelState.prototype = {
   	create: function() {
         this.planet = new Platformer.World(Platformer.game);
-        this.planet.create(Platformer.cache.levelData);
+        this.planet.create(
+            Platformer.cache.levelData,
+            Platformer.cache.messageData);
 	},
     update: function() {
         this.planet.update();
@@ -142,9 +208,17 @@ Platformer.World.getPos = function(x, y) {
     };
 };
 
+Platformer.World.getJsonPos = function(pos) {
+    return {
+        x: (pos.x - Platformer.padding) / Platformer.unit,
+        y: (pos.y - Platformer.padding) / Platformer.unit,
+    };
+};
+
 Platformer.World.prototype = {
-    create: function(levelData) {
+    create: function(levelData, messageData) {
         var that = this;
+
         var startPositions = [];
         levelData.tiles.forEach(function(tile) {
             if(tile.type == null) {
@@ -176,6 +250,8 @@ Platformer.World.prototype = {
             this.bounds.min.x, this.bounds.min.y,
             this.bounds.max.x - this.bounds.min.x,
             this.bounds.max.y - this.bounds.min.y);
+
+        messageData.forEach(this.addOnion);
     },
 
     addSpinner: function(x, y) {
@@ -281,6 +357,26 @@ Platformer.World.prototype = {
         this.goals.add(square);
     },
 
+    addOnion: function(data) {
+        var pos = Platformer.World.getPos(
+            data.onion.pos.x, data.onion.pos.y);
+        var square = Platformer.createSquare(
+            pos, data.onion.color + "90",
+            Platformer.playerScale);
+
+        square.body.allowGravity = false;
+        square.body.immovable = true;
+
+        if(data.message) {
+            var text = Platformer.game.add.text(
+                pos.x, pos.y - (Platformer.unit / 2),
+                Platformer.getMessage(data.message),
+                Platformer.getFontStyle(data.onion.color));
+
+                text.anchor.set(0.5);
+        }
+    },
+
     update: function() {
         this.player.collide(this.obstacles, this.onPlayerDie);
         this.player.collide(this.goals, this.onPlayerReachGoal);
@@ -292,16 +388,20 @@ Platformer.World.prototype = {
         if(pos.x < Platformer.padding
                 || (this.bounds.max.x - pos.x) < Platformer.padding
                 || (this.bounds.max.y - pos.y) < Platformer.padding) {
-            this.onPlayerDie();
+            this.onPlayerDie(this.player);
         }
     },
 
-    onPlayerDie: function(other) {
+    onPlayerDie: function(player) {
         console.log("DIE!");
+        // todo: MSG SELECT LOGIC
+        Platformer.pushOnionData(
+            Platformer.World.getJsonPos(player.getPos()),
+            player.color);
         Platformer.game.state.start("LoadState");
     },
 
-    onPlayerReachGoal: function(other) {
+    onPlayerReachGoal: function() {
         console.log("WIN!");
         Platformer.game.state.start("LoadState");
     },
@@ -311,8 +411,9 @@ Platformer.World.prototype = {
  * The player object.
  */
 Platformer.Player = function(pos) {
+    this.color = "#FFFF00";
     this.square = Platformer.createSquare(
-        pos, "#FFFF00", Platformer.playerScale);
+        pos, this.color, Platformer.playerScale);
 
     Platformer.game.camera.follow(this.square);
 
@@ -351,7 +452,7 @@ Platformer.Player.prototype = {
 
     collide: function(other, callback) {
         if(Platformer.game.physics.arcade.collide(this.square, other) && callback) {
-            callback(other);
+            callback(this);
         }
     }
 };
