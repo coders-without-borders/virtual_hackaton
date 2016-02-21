@@ -14,6 +14,7 @@ var Platformer = Platformer || {
         jump: 50 * 8.4,
     },
     cache: {},
+    maxOnionSkins: 500,
 };
 
 /**
@@ -146,13 +147,17 @@ Platformer.loadLevelData = function(callback) {
  *   + Pull the actual message data from the server
  */
 Platformer.loadMessageData = function(callback) {
-    if(Platformer.cache.messageData) {
-        callback();
-    }
-    else {
-        Platformer.cache.messageData = [];
-        callback();
-    }
+    $.ajax({
+        'url' : '/onion_skin/get_last',
+        'type' : 'GET',
+        'data' : {
+            'count' : Platformer.maxOnionSkins,
+        },
+        'success' : function(response) {
+            Platformer.cache.messageData = response.results;
+            callback();
+        },
+    });
 };
 
 /**
@@ -179,14 +184,18 @@ Platformer.submitOnionData = function(message) {
         onion.message = message;
         // instead of pushing it, let's just submit it!
         Platformer.cache.messageData.push(onion);
+
+        $.ajax({
+            'url' : '/onion_skin/add',
+            'type' : 'POST',
+            'data' : onion,
+        });
     }
 };
 
 Platformer.cachePlayerOnion = function(path, color) {
     Platformer.cache.onionData = {
-        onion: {
-            path: path, color: color,
-        },
+        path: path, color: color,
     };
 }
 
@@ -506,29 +515,29 @@ Platformer.World.prototype = {
         this.goals.add(square);
     },
 
-    addOnion: function(data) {
-        var c = data.onion.path.length;
+    addOnion: function(onion) {
+        var c = onion.path.length;
         var step = 1.0 / c;
         var bounds = new Platformer.Bounds();
 
         for(var i = 0; i < c; ++i) {
             var alpha = ((step + (step * i)) * 125).toString(16).substr(0,2);
-            var pos = data.onion.path[i];
+            var pos = onion.path[i];
             bounds.addPos(pos);
             var square = Platformer.createSquare(
-                pos, data.onion.color + alpha,
+                pos, onion.color + alpha,
                 Platformer.playerScale);
 
             square.body.allowGravity = false;
             square.body.immovable = true;
         }
 
-        if(data.message) {
+        if(onion.message) {
             var msgPos = bounds.computeCenter();
             var text = Platformer.game.add.text(
                 msgPos.x, msgPos.y - (Platformer.unit / 1.25),
-                String.fromCodePoint(data.message),
-                Platformer.getFontStyle(data.onion.color));
+                String.fromCodePoint(onion.message),
+                Platformer.getFontStyle(onion.color));
 
                 text.anchor.set(0.5);
         }
@@ -550,7 +559,6 @@ Platformer.World.prototype = {
     },
 
     onPlayerDie: function(player) {
-        console.log("DIE!");
         Platformer.cachePlayerOnion(
             player.getPath(),
             player.color);

@@ -4,7 +4,7 @@
     function initialize(config)
     {
 		config = config || {};
-		
+
         var url = config.mongoDb || 'mongodb://localhost:1111/player';
         mongoClient.connect(url, function(err, db) {
           if( err ) {
@@ -22,15 +22,16 @@
         /* data should be in the form of:
         {
             color: "#aabbcc",
-            positions: [ {x: 10, y: 20 }, {x: 12, y: 20 } ]
+            path: [ {x: 10, y: 20 }, {x: 12, y: 20 } ],
+            message: 244234, // optional
         }
         */
         console.log("Inserting:");
         console.log(data);
 
-        for (var i = 0; i < data.positions.length; i++) {
-            data.positions[i].x = parseInt(data.positions[i].x);
-            data.positions[i].y = parseInt(data.positions[i].y);
+        for (var i = 0; i < data.path.length; i++) {
+            data.path[i].x = parseInt(data.path[i].x);
+            data.path[i].y = parseInt(data.path[i].y);
         }
 
         database.collection('onion_skin').insertOne( data, function( err, result ) {
@@ -64,6 +65,30 @@
             });
     }
 
+    function getLastOnionSkins( req, res ) {
+        var results = [];
+        var count = parseInt(req.query.count);
+
+        var collection = database.collection('onion_skin');
+        var total = collection.find().count();
+        var skip = 0;
+        if(total > count) {
+            skip = total - count;
+        }
+
+        var last = collection
+            .find({}, {_id: 0, path: 1, color: 1, message: 1 })
+            .skip(skip);
+
+        last.toArray(function(err, result) {
+            if ( err ) {
+                console.log(err);
+            } else {
+                res.json({ results: result });
+            }
+        });
+    }
+
     function dropOnionSkins( req, res ) {
         database.collection('onion_skin').drop();
     }
@@ -71,5 +96,6 @@
     module.exports.initialize = initialize;
     module.exports.addOnionSkin = addOnionSkin;
     module.exports.getVisibleOnionSkins = getVisibleOnionSkins;
+    module.exports.getLastOnionSkins = getLastOnionSkins;
     module.exports.dropOnionSkins = dropOnionSkins;
 }());

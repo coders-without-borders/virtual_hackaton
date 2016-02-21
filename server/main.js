@@ -36,7 +36,7 @@ app.post('/nextLevel', function(req, res) {
 		}
 
 		console.log('Next level:', repo.username, repo.repo, 'with', repo.votes, 'votes');
-		
+
 		votes.reset_votes();
 		wg.triggerNextLevel({
 			user: repo.username,
@@ -51,7 +51,8 @@ app.get('/votes/get_top_repos', votes.get_top_repos);
 
 app.post('/onion_skin/drop', mongo_database.dropOnionSkins);
 app.post('/onion_skin/add', mongo_database.addOnionSkin);
-app.post('/onion_skin/get_visible', mongo_database.getVisibleOnionSkins);
+app.get('/onion_skin/get_visible', mongo_database.getVisibleOnionSkins);
+app.get('/onion_skin/get_last', mongo_database.getLastOnionSkins);
 
 sqlite_database.initialize(args);
 mongo_database.initialize(args);
