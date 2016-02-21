@@ -24,7 +24,26 @@ app.get('/', function (req, res) {
 
 app.use('/world', wg.router);
 
-app.post('/votes/vote_for_repo', votes.vote_for_repo );
+app.post('/nextLevel', function(req, res) {
+	votes.get_top_repo(function(err, repo) {
+		if(err) {
+			console.log(err);
+			res.status(500).send();
+			return;
+		}
+
+		console.log('Next level:', repo.username, repo.repo, 'with', repo.votes, 'votes');
+		
+		votes.reset_votes();
+		wg.triggerNextLevel({
+			user: repo.username,
+			repo: repo.repo,
+		});
+		res.send();
+	});
+});
+
+app.post('/votes/vote_for_repo/:user/:repo', votes.vote_for_repo);
 app.get('/votes/get_top_repos', votes.get_top_repos);
 
 app.post('/onion_skin/drop', mongo_database.dropOnionSkins);

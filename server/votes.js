@@ -4,12 +4,13 @@
     function vote_for_repo( req, res )
     {
         console.log(req.body);
-        var data = req.body;
+		var user = req.params.user;
+		var repo = req.params.repo;
 
         database.run(
-            'INSERT OR REPLACE INTO votes(idRepo, votes) VALUES( ?, COALESCE((SELECT votes FROM votes WHERE idRepo = ?), 0) + 1);',
-            data.repo_url,
-            data.repo_url,
+            'INSERT OR REPLACE INTO votes(username, repo, votes) VALUES( ?, ?, COALESCE((SELECT votes FROM votes WHERE username = ? AND repo = ?), 0) + 1);',
+			user, repo,
+			user, repo,
             function( err ) {
                 if ( err ) {
                     console.log(err);
@@ -41,6 +42,27 @@
         );
     }
 
+	function reset_votes(cb) {
+        database.run(
+            'UPDATE votes SET votes = 0;',
+            function( err ) {
+				if(cb)
+					cb(err);
+            }
+        );
+	}
+
+	function get_top_repo(cb) {
+        database.all(
+            'SELECT * FROM votes ORDER BY votes DESC LIMIT 1',
+            function( err, rows ) {
+				cb(err, rows[0]);
+            }
+        );
+	}
+
     module.exports.vote_for_repo = vote_for_repo;
     module.exports.get_top_repos = get_top_repos;
+    module.exports.reset_votes = reset_votes;
+	module.exports.get_top_repo = get_top_repo;
 }());
