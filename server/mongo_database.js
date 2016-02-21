@@ -74,14 +74,17 @@
             console.log("Inserting:");
             console.log(onionData);
 
-            database.collection('onion_skin').insertOne( onionData, function( err, result ) {
-                if ( err ) {
-                    console.log(err);
-                } else {
-                    console.log("Inserted onion shell");
-                }
-                res.send("");
-            } );
+            if ( onionData ) {
+
+                database.collection('onion_skin').insertOne( onionData, function( err, result ) {
+                    if ( err ) {
+                        console.log(err);
+                    } else {
+                        console.log("Inserted onion shell");
+                    }
+                    res.send("");
+                } );
+            }
         });
     }
 
