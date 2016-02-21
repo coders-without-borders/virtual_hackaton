@@ -270,11 +270,14 @@ var DeadState = function(){};
 DeadState.prototype = {
   	preload: function() {
         this.continueButton = Platformer.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.ui = Platformer.ui.factory('dead').show();
-		this.ui.element("submit").submit(function() {
-            Platformer.game.state.start("LoadState");
-			return false;
-		});
+
+		if(Platformer.ui) {
+			this.ui = Platformer.ui.factory('dead').show();
+			this.ui.element("submit").submit(function() {
+				Platformer.game.state.start("LoadState");
+				return false;
+			});
+		}
     },
     update: function() {
         if(this.continueButton.isDown) {
@@ -282,7 +285,8 @@ DeadState.prototype = {
         }
     },
     shutdown: function() {
-        this.ui.hide();
+		if(this.ui)
+			this.ui.hide();
     },
 };
 
