@@ -12,27 +12,21 @@
     <script type="text/javascript">
 
     $(function() {
-        const levelURL = "http://localhost:3000/world/rust-lang/rust";
-        $.getJSON(levelURL).then(function (level) {
-            Platformer.game = new Phaser.Game(
-                400, 400, Phaser.AUTO, '',
-                { preload: preload, create: create, update: update });
+        Platformer.game = new Phaser.Game(
+            400, 400, Phaser.AUTO, 'Game',
+            { preload: preload, create: create, update: update });
 
-            var world;
+        function preload () {
+            Platformer.preload();
+        }
 
-            function preload () {
-            }
+        function create () {
+            Platformer.create();
+        }
 
-            function create () {
-                Platformer.init();
-                world = new Platformer.World();
-                world.start(level);
-            }
-
-            function update() {
-                world.update();
-            }
-        });
+        function update() {
+            Platformer.update();
+        }
     });
 
     </script>

@@ -14,6 +14,7 @@ var Platformer = Platformer || {
         walk: 120,
         jump: 180,
     },
+    cache: {},
 };
 
 Platformer.Color = function(r, g, b) {
@@ -34,11 +35,32 @@ Platformer.Color.fromHex = function(hex) {
 /**
  * Initialize the platformer stuff
  */
-Platformer.init = function() {
+Platformer.preload = function() {
+};
+
+Platformer.create = function() {
     window.Platformer = Platformer;
     Platformer.game.physics.startSystem(Phaser.Physics.ARCADE);
     Platformer.game.physics.arcade.gravity.y = Platformer.gravity;
-}
+
+    Platformer.game.state.add("LevelState", LevelState);
+    Platformer.game.state.add("LoadState", LoadState);
+    Platformer.game.state.start("LoadState");
+};
+
+Platformer.update = function() {
+
+};
+
+Platformer.getLevelData = function(callback) {
+    if(Platformer.cache.levelData) {
+        callback(Platformer.cache.levelData);
+    }
+    else {
+        var levelURL = "http://localhost:3000/world/rust-lang/rust";
+        $.getJSON(levelURL).then(callback);
+    }
+};
 
 /**
  * A helper function to create a square with physics.
@@ -72,6 +94,31 @@ Platformer.createCircle = function(pos, color, scale) {
 }
 
 /**
+ * Different states
+ */
+
+var LoadState = function(){};
+LoadState.prototype = {
+  	create: function(){
+        Platformer.getLevelData(function(levelData) {
+            Platformer.cache.levelData = levelData;
+            Platformer.game.state.start("LevelState");
+        });
+	},
+};
+
+var LevelState = function(){};
+LevelState.prototype = {
+  	create: function() {
+        this.planet = new Platformer.World(Platformer.game);
+        this.planet.create(Platformer.cache.levelData);
+	},
+    update: function() {
+        this.planet.update();
+    },
+};
+
+/**
  * The World object
  */
 Platformer.World = function() {
@@ -93,10 +140,10 @@ Platformer.World.getPos = function(x, y) {
 };
 
 Platformer.World.prototype = {
-    start: function(level) {
+    create: function(levelData) {
         var that = this;
         var startPositions = [];
-        level.tiles.forEach(function(tile) {
+        levelData.tiles.forEach(function(tile) {
             if(tile.type == null) {
                 that.addPlatform(tile.position[0], tile.position[1], tile.color);
             }
@@ -115,7 +162,7 @@ Platformer.World.prototype = {
         });
 
         var pos = startPositions[Math.floor(Math.random() * startPositions.length)];
-        this.player = new Platformer.Player(Platformer.World.getPos(pos[0], pos[1]));
+        this.player = new Platformer.Player(Platformer.World.getPos(pos[0], pos[1]), Platformer.game);
 
         Platformer.game.world.setBounds(
             this.bounds.min.x, this.bounds.min.y,
@@ -237,10 +284,12 @@ Platformer.World.prototype = {
 
     onPlayerDie: function(other) {
         console.log("DIE!");
+        Platformer.game.state.start("LoadState");
     },
 
     onPlayerReachGoal: function(other) {
         console.log("WIN!");
+        Platformer.game.state.start("LoadState");
     },
 };
 
