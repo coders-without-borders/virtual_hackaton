@@ -692,13 +692,13 @@ Platformer.World.prototype = {
 	onPlayerTouchedPlatform: function(player, platform) {
 		if(!Platformer.ui || !platform.platformData)
 			return;
-		
+
 		if(player.lastPlatform != platform) {
 			player.lastPlatform = platform;
 
 			var ui = Platformer.ui.factory("left");
 			var commit = ui.element("commitArea");
-			
+
 			commit.find('#authorImg').attr('src', platform.platformData.avatar);
 			commit.find('#author').text(platform.platformData.author);
 			commit.find('#commitSha').text(platform.platformData.id);
@@ -714,7 +714,9 @@ Platformer.World.prototype = {
  * The player object.
  */
 Platformer.Player = function(pos) {
-    this.color = "#FFFF00";
+    var playerScheme = palette("cb-PiYG",10);
+
+    this.color = playerScheme[Math.floor(Math.random() * 10)];
     this.square = Platformer.createSquare(
         pos, this.color, Platformer.playerScale);
 	this.square.player = this;
@@ -773,7 +775,7 @@ Platformer.Player.prototype = {
 				return callback.call(self, a, b);
 			}
 		}
-		
+
 		Platformer.game.physics.arcade.collide(this.square, other, ourCB, null, this);
     }
 };
