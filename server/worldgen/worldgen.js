@@ -119,7 +119,8 @@ WorldGenerator.prototype.getLevelData = function(opts) {
 					commits: commits,
 					leaves: leaves,
 					target: target,
-                    contributors: contributors
+                    contributors: contributors,
+                    repoString: opts.user + "/" + opts.repo
 				});
 			};
 
@@ -354,6 +355,7 @@ WorldGenerator.prototype.generateLevel = function(opts) {
 
 		var result = {
 			tiles: levelData.tiles,
+            repoString: levelData.repoString
 		};
 
 		levelData.platforms.forEach(function(commit) {

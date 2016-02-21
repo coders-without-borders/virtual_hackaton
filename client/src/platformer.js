@@ -298,8 +298,11 @@ LevelState.prototype = {
 			this.rightSidebar = Platformer.ui.factory("right");
 			this.leftSidebar.element("audioArea").removeClass('uiHidden');
 
+            this.leftSidebar.find("#commitArea h3").html( Platformer.cache.levelData.repoString );
 			this.refresh();
+
 		}
+
 	},
 	refresh: function() {
 		var self = this;
