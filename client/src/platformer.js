@@ -188,14 +188,22 @@ Platformer.getFontStyle = function(color) {
  *
  * [TODO] Push the data also to the server
  */
-Platformer.pushOnionData = function(path, color, msg) {
-    var onion = {
-        onion: {path: path, color: color},
-        msg: msg
-    };
-
-    Platformer.cache.messageData.push(onion);
+Platformer.submitOnionData = function(msg) {
+    var onion = Platformer.cache.onionData;
+    if(onion) {
+        onion.msg = msg;
+        // instead of pushing it, let's just submit it!
+        Platformer.cache.messageData.push(onion);
+    }
 };
+
+Platformer.cachePlayerOnion = function(path, color) {
+    Platformer.cache.onionData = {
+        onion: {
+            path: path, color: color,
+        },
+    };
+}
 
 /**
  * A helper function to create a square with physics.
@@ -529,10 +537,10 @@ Platformer.World.prototype = {
 
     onPlayerDie: function(player) {
         console.log("DIE!");
-        // todo: MSG SELECT LOGIC
-        Platformer.pushOnionData(
+        Platformer.cachePlayerOnion(
             player.getPath(),
             player.color);
+
         Platformer.game.state.start("DeadState");
     },
 
