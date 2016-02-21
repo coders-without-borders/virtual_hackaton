@@ -56,6 +56,8 @@ Platformer.preload = function() {
 
 Platformer.create = function() {
     window.Platformer = Platformer;
+    Platformer.game.stage.backgroundColor = "rgb(99, 99, 99)";
+
     Platformer.game.physics.startSystem(Phaser.Physics.ARCADE);
     Platformer.game.physics.arcade.gravity.y = Platformer.gravity;
     Platformer.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -346,7 +348,7 @@ Platformer.World.prototype = {
         var offset = circularOffset(angle);
         angle = offset[1];
 
-        var circle = Platformer.createCircle(offset[0], "#FFFFFF", 0.85);
+        var circle = Platformer.createCircle(offset[0], "#b2182b", 0.85);
         circle.body.allowGravity = false;
 
         circle.update = function() {
@@ -379,7 +381,7 @@ Platformer.World.prototype = {
         var offset = linearOffset(angle);
         angle = offset[1];
 
-        var circle = Platformer.createCircle(offset[0], "#FFFFFF", 0.85);
+        var circle = Platformer.createCircle(offset[0], "#b2182b", 0.85);
         circle.body.allowGravity = false;
 
         circle.update = function() {

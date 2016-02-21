@@ -24,7 +24,7 @@ function easyStraightLine(levelData, platforms) {
 		commit.position = nextPos;
 		lastPos = nextPos;
 	}
-};
+}
 
 function miniCluster(levelData, platforms) {
 	var count = Math.min(platforms.length, levelData.random.integer({min: 8, max: 16}));

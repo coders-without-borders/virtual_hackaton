@@ -5,7 +5,7 @@ const GitHubApi = require('github'),
 	  Chance = require('chance'),
 	  util = require('util'),
 	  platformGenerators = require('./platformGenerators'),
-      Palette = require('./palette');
+      ExecFile = require('./execfile');
 
 const githubLevelData = {
 	getRepo: function(wg, opts, cb) { return wg.github.repos.get(opts, cb); },
@@ -114,6 +114,7 @@ WorldGenerator.prototype.getLevelData = function(opts) {
 			const branch = repo.default_branch;
 
 			const finish = function() {
+                console.log( "Assigning contributors with length: " + contributors.length );
 				a({
 					commits: commits,
 					leaves: leaves,
@@ -184,15 +185,16 @@ WorldGenerator.prototype.getLevelData = function(opts) {
             levelData.getContributors(self, {
                 user: opts.user,
                 repo: opts.repo
-            }, function(err, contributors) {
+            }, function(err, cont) {
                 if ( err ) {
                     r(err);
                     return;
                 } else {
-                    contributors = contributors;
+                    contributors = cont;
                     contributors.sort( function( a, b ) {
                         return a.total > b.total;
-                    }).slice(10);
+                    });
+                    contributors = contributors.slice(0, 10);
 
 	                next();
                 }
@@ -214,7 +216,8 @@ WorldGenerator.prototype.generatePlatforms = function(levelData) {
 
 	levelData.commits[levelData.target].isMaster = true;
 
-    var colorPalette = Palette.palette('tol-sq', levelData.contributors.length);
+    var context = ExecFile(__dirname + "/palette.js");
+    var colorPalette = context.palette('cb-RdYlBu', levelData.contributors.length);
 
 	// Mark mainline
 	var mainNode = levelData.commits[levelData.target];
@@ -258,7 +261,7 @@ WorldGenerator.prototype.generatePlatforms = function(levelData) {
 		const authorRandom = new Chance(commit.commit.author.email);
 
 		commit.position = null;
-		commit.color = colorPalette[authorRandom.natural({max: levelData.contributors.length - 1})];
+		commit.color = colorPalette[authorRandom.natural({min: 0, max: levelData.contributors.length - 1})];
 
 		commit.width = 3;
 		commit.height = 1;
@@ -363,20 +366,20 @@ WorldGenerator.prototype.generateLevel = function(opts) {
 						Math.trunc(pos[0] + x - (commit.width * 0.5)),
 						Math.trunc(pos[1] + y - (commit.height * 0.5))];
 
-					// If we're on the spawn or goal:
+
+                    // If we're on the spawn or goal:
 					if (levelData.spawn.sha == commit.sha) {
 						const spos = [tpos[0], tpos[1]-1];
 						result.tiles.push({
 							type: "spawn",
-							position: spos,
-							color: 'green',
+							position: spos
 						});
 					} else if (levelData.goal.sha == commit.sha) {
 						const spos = [tpos[0], tpos[1]-1];
 						result.tiles.push({
 							type: "goal",
 							position: spos,
-							color: 'blue',
+                            color: "#3c53a1"
 						});
 					}
 
